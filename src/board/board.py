@@ -55,55 +55,69 @@ class BoardGame:
         self.game_height = self.game_width  # Making the window square
         self.screen = pygame.display.set_mode((self.total_width, self.game_height))  # Use total_width to consider the log space
         pygame.display.set_caption("GOMOKU Game")
+        self.visible_count = self.game_height // (self.small_font.get_height() + 5)  # Calculate the number of moves that can be visible at once
 
     def handle_setup_event(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN and not self.start_button_active:
-                if self.input_text.isdigit() and 0 < int(self.input_text) <= 20:
-                    self.board_size = int(self.input_text)
-                    self.start_button_active = True
-                else:
-                    print("Please enter a valid board size (1-20).")
-            elif event.key == pygame.K_BACKSPACE:
+            if event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
             else:
                 if event.unicode.isdigit() and len(self.input_text) < 3:
                     self.input_text += event.unicode
-        elif event.type == pygame.MOUSEBUTTONDOWN and self.start_button_active:
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             if self.start_button.collidepoint(event.pos):
-                self.game_started = True
+                if self.input_text.isdigit() and 4 < int(self.input_text) <= 20:
+                    self.board_size = int(self.input_text)
+                    self.game_started = True  # Start the game
+                else:
+                    self.start_button_active = False  # Disable the start button
+                    print("Please enter a valid board size (5-20).")  # Or show this message in the GUI
+
+    def draw_error_message(self):
+        if not self.start_button_active and self.input_text:
+            # Assume that if the start button isn't active but there's input, it's an error
+            error_msg = "Enter a board size between 5-20"
+            self.draw_text_centered(error_msg, self.small_font, (255, 0, 0), pygame.Rect(0, 350, self.total_width, 50))
 
     def run_game(self):
         self.game_width = self.board_size * self.cell_size
         self.total_width = self.game_width + self.log_width  # Update total width
-        self.game_height = self.game_width  # Making the height equal to the game width for a square board
+        self.game_height = self.game_width + self.cell_size  # Making the height equal to the game width for a square board
         self.screen = pygame.display.set_mode((self.total_width, self.game_height))
+        self.log_scroll_pos = max(0, len(self.move_history) - self.visible_count)  # Update scroll position on new game
         while self.game_started:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 self.handle_game_event(event)
-
             self.draw_board_screen()
         
     def handle_game_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:  # Left click
-                if event.pos[0] < self.game_width:
-                    x, y = event.pos[0] // self.cell_size, event.pos[1] // self.cell_size
-                    # Add point if the cell is empty
-                    if self.game_matrix[y][x] is None:
-                        self.game_matrix[y][x] = self.current_player
-                        self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
-                        self.current_player = (self.current_player + 1) % 2  # Switch players
-                        self.move += 1
+            mouse_x, mouse_y = event.pos
+            if event.button == 1 and mouse_x < self.game_width + self.cell_size:
+                board_x, board_y = mouse_x - self.cell_size, mouse_y - self.cell_size # subtract offset here before calculating x and y
+                if board_x >= 0 and board_y >= 0:  # Check if the click is within the positive index range
+                    x, y = board_x // self.cell_size, board_y // self.cell_size
+                    if 0 <= x < self.board_size and 0 <= y < self.board_size: # Check for valid board indices
+                        self.play_a_turn(x, y)
             elif event.button == 4:  # Mouse wheel up
+                self.update_log_scroll(-1)
                 self.log_scroll_pos = max(self.log_scroll_pos - 1, 0)
             elif event.button == 5:  # Mouse wheel down
+                self.update_log_scroll(1)
                 max_scroll_pos = max(0, len(self.move_history) - (self.game_height // (self.small_font.get_height() + 5)))
                 self.log_scroll_pos = min(self.log_scroll_pos + 1, max_scroll_pos)
                 
+    def play_a_turn(self, x, y):
+        if self.game_matrix[y][x] is None:
+            self.game_matrix[y][x] = self.current_player
+            # Log the move with a shifted position because the visual offset doesn't change matrix coordinates
+            self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
+            self.current_player = (self.current_player + 1) % 2  # Switch players
+            self.move += 1
+
     def draw_setup_screen(self):
         self.screen.fill(self.bg_color)
         # Draw welcome message
@@ -121,52 +135,90 @@ class BoardGame:
         self.start_button.topleft = (start_button_x, self.start_button.top)  # Update the start button to new position
         pygame.draw.rect(self.screen, (0, 255, 0) if self.start_button_active else (100, 100, 100), self.start_button)
         self.draw_text_centered("Start", self.small_font, self.font_color, self.start_button)
-
+        self.draw_error_message()
         pygame.display.flip()
         self.clock.tick(30)
 
     def draw_board_screen(self):
         # Draw the game board and the log side by side
         self.screen.fill(self.bg_color)
-        
+
+        # Make the background for the indices
+        index_background_color = (0, 0, 0) # Darker than bg_color for contrast
+        index_background_rect = pygame.Rect(0, 0, self.game_width, self.cell_size)
+        pygame.draw.rect(self.screen, index_background_color, index_background_rect)
+
         # Draw the board on its own part of the screen
         board_surf = pygame.Surface((self.game_width, self.game_height))
-        board_surf.fill(self.bg_color)
+        board_surf.fill(self.board_color)
+        # Adjust to draw indices
+        # Adjusted code within draw_board_screen method
         for y in range(self.board_size):
             for x in range(self.board_size):
-                rect = pygame.Rect(x * self.cell_size, y * self.cell_size, self.cell_size, self.cell_size)
-                pygame.draw.rect(board_surf, self.board_color, rect, 1)
+                rect = pygame.Rect(x * self.cell_size, y * self.cell_size, self.cell_size, self.cell_size) # Removed the additional offset here
+                pygame.draw.rect(board_surf, self.bg_color, rect, 1)
                 if self.game_matrix[y][x] is not None:
-                    # Draw the player's piece on the board
                     pygame.draw.circle(board_surf, self.player_colors[self.game_matrix[y][x]], rect.center, self.cell_size // 3)
 
-        # Blit the board surface onto the screen
-        self.screen.blit(board_surf, (0, 0))
-        
+        # Blit the board surface onto the screen with an offset for indices
+        self.screen.blit(board_surf, (self.cell_size, self.cell_size))
+
+        # Draw indices
+        self.draw_indices()
+
         # Draw the log on its own part of the screen
         log_surf = pygame.Surface((self.log_width, self.game_height))
         log_surf.fill(self.bg_color)
         self.draw_log(log_surf)
-        self.screen.blit(log_surf, (self.game_width, 0))  # Position the log surface to the right of the board
+        self.screen.blit(log_surf, (self.game_width + self.cell_size, self.cell_size))  # Position the log surface to the right of the board with offset
 
         pygame.display.flip()
         self.clock.tick(30)
         
+    def draw_indices(self):
+        # Adjust the offset to align with the board offset
+        index_offset_x = self.cell_size
+        index_offset_y = self.cell_size
+        
+        # Draw row indices along the left edge
+        for y in range(self.board_size):
+            text_surface = self.small_font.render(str(y), True, self.font_color)
+            text_rect = text_surface.get_rect(left=5, centery=(y * self.cell_size + index_offset_y + self.cell_size // 2))
+            self.screen.blit(text_surface, text_rect)
+
+        # Draw column indices along the top edge
+        for x in range(self.board_size):
+            text_surface = self.small_font.render(str(x), True, self.font_color)
+            text_rect = text_surface.get_rect(centerx=(x * self.cell_size + index_offset_x + self.cell_size // 2), top=5)
+            self.screen.blit(text_surface, text_rect)
+
     def draw_text_centered(self, text, font, color, rect):
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect(center=rect.center)
         self.screen.blit(text_surface, text_rect)
 
-    def draw_log(self, surface):
-        # Method to draw the log of moves
-        log_label = self.small_font.render('Move Log', True, self.font_color)
-        surface.blit(log_label, (10, 5))  # Draw the log label at the top
-        start_index = self.log_scroll_pos
-        end_index = start_index + (self.game_height // (self.small_font.get_height() + 5))
+    def update_log_scroll(self, amount):
+        # This method updates the log_scroll_pos based on the amount of scroll steps (lines), not pixels
+        scroll_steps = amount  # Here amount is in terms of steps or lines, not pixels
+        self.log_scroll_pos += scroll_steps
+        self.log_scroll_pos = max(0, min(self.log_scroll_pos, len(self.move_history) - self.visible_count))
         
-        for i, text in enumerate(self.move_history[start_index:end_index]):  # Show only visible moves
+    def draw_log(self, surface):
+        # Define how many moves can be visible at once based on your surface height
+        log_label = self.small_font.render('Move Log', True, self.font_color)
+        surface.blit(log_label, (10, 0))  # Draw the log label at the top
+
+        start_index = self.log_scroll_pos
+        end_index = start_index + self.visible_count
+
+        reversed_move_history = list(reversed(self.move_history))  # Reverse the entire move history
+        visible_moves = reversed_move_history[start_index:end_index]  # Make sure you get the right slice of the move history to display
+    
+        # Draw each of the visible moves
+        for i, text in enumerate(reversed(visible_moves)):
             move_surf = self.small_font.render(text, True, self.font_color)
-            surface.blit(move_surf, (10, 30 + i * (self.small_font.get_height() + 5)))
+            y_position = 30 + (self.visible_count - i) * (self.small_font.get_height())  # Calculate y position
+            surface.blit(move_surf, (10, y_position))
 
 game = BoardGame()
 game.run()
