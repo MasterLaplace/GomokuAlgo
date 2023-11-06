@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
-import pygame
+
 import sys
+
+try:
+    import pygame
+except ImportError:
+    print("Pygame not found. Please install it with \"pip install pygame\".")
+    sys.exit()
 
 class BoardGame:
     def __init__(self):
@@ -80,6 +86,8 @@ class BoardGame:
 
     def draw_error_message(self):
         if not self.start_button_active and self.input_text:
+            if self.input_text.isdigit() and 4 < int(self.input_text) <= 20:
+                return
             # Assume that if the start button isn't active but there's input, it's an error
             error_msg = "Enter a board size between 5-20"
             self.draw_text_centered(error_msg, self.small_font, (255, 0, 0), pygame.Rect(0, 350, self.total_width, 50))
@@ -150,7 +158,9 @@ class BoardGame:
 
         # Make the background for the indices
         index_background_color = (0, 0, 0) # Darker than bg_color for contrast
-        index_background_rect = pygame.Rect(0, 0, self.game_width, self.cell_size)
+        index_background_rect = pygame.Rect(0, 0, self.game_width + self.cell_size, self.cell_size)
+        pygame.draw.rect(self.screen, index_background_color, index_background_rect)
+        index_background_rect = pygame.Rect(0, 0, self.cell_size, self.game_height + self.cell_size)
         pygame.draw.rect(self.screen, index_background_color, index_background_rect)
 
         # Draw the board on its own part of the screen
