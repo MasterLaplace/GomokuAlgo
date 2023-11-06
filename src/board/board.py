@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import pygame
 import sys
 
@@ -33,10 +34,14 @@ class BoardGame:
         self.log_scroll_pos = 0  # Initial log scroll position
         self.move = 0
 
+        self.frame_count = 0
+        self.frame_rate = 60
+        self.start_time = 5
+
     def run(self):
         while not self.game_started:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                     pygame.quit()
                     sys.exit()
                 self.handle_setup_event(event)
@@ -87,12 +92,12 @@ class BoardGame:
         self.log_scroll_pos = max(0, len(self.move_history) - self.visible_count)  # Update scroll position on new game
         while self.game_started:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                     pygame.quit()
                     sys.exit()
                 self.handle_game_event(event)
             self.draw_board_screen()
-        
+
     def handle_game_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
@@ -109,7 +114,7 @@ class BoardGame:
                 self.update_log_scroll(1)
                 max_scroll_pos = max(0, len(self.move_history) - (self.game_height // (self.small_font.get_height() + 5)))
                 self.log_scroll_pos = min(self.log_scroll_pos + 1, max_scroll_pos)
-                
+
     def play_a_turn(self, x, y):
         if self.game_matrix[y][x] is None:
             self.game_matrix[y][x] = self.current_player
@@ -137,7 +142,7 @@ class BoardGame:
         self.draw_text_centered("Start", self.small_font, self.font_color, self.start_button)
         self.draw_error_message()
         pygame.display.flip()
-        self.clock.tick(30)
+        self.clock.tick(self.frame_rate)
 
     def draw_board_screen(self):
         # Draw the game board and the log side by side
@@ -172,14 +177,45 @@ class BoardGame:
         self.draw_log(log_surf)
         self.screen.blit(log_surf, (self.game_width + self.cell_size, self.cell_size))  # Position the log surface to the right of the board with offset
 
+        # Draw the timer
+        timer_surf = pygame.Surface((self.log_width, self.cell_size))
+        timer_surf.fill(self.bg_color)
+        self.draw_timer(timer_surf)
+        self.screen.blit(timer_surf, (self.game_width + self.cell_size, 0))
+
         pygame.display.flip()
-        self.clock.tick(30)
-        
+        self.clock.tick(self.frame_rate)
+
+    def draw_timer(self, surface):
+        # --- Timer going down ---
+        # --- Timer going up ---
+        # Calculate total seconds
+        if self.current_player == 0:
+            self.frame_count = 0
+        total_seconds = self.start_time - (self.frame_count // self.frame_rate)
+        if total_seconds < 0:
+            total_seconds = 0
+        elif self.current_player == 1 and total_seconds > 0:
+            self.frame_count += 1
+
+        # Divide by 60 to get total minutes
+        minutes = total_seconds // 60
+
+        # Use modulus (remainder) to get seconds
+        seconds = total_seconds % 60
+
+        # Use python string formatting to format in leading zeros
+        output_string = "Time left: {0:02}:{1:02}".format(minutes, seconds)
+
+        # Blit to the screen
+        text = self.small_font.render(output_string, True, self.font_color)
+        surface.blit(text, (10, 0))
+
     def draw_indices(self):
         # Adjust the offset to align with the board offset
         index_offset_x = self.cell_size
         index_offset_y = self.cell_size
-        
+
         # Draw row indices along the left edge
         for y in range(self.board_size):
             text_surface = self.small_font.render(str(y), True, self.font_color)
@@ -202,7 +238,7 @@ class BoardGame:
         scroll_steps = amount  # Here amount is in terms of steps or lines, not pixels
         self.log_scroll_pos += scroll_steps
         self.log_scroll_pos = max(0, min(self.log_scroll_pos, len(self.move_history) - self.visible_count))
-        
+
     def draw_log(self, surface):
         # Define how many moves can be visible at once based on your surface height
         log_label = self.small_font.render('Move Log', True, self.font_color)
@@ -213,7 +249,7 @@ class BoardGame:
 
         reversed_move_history = list(reversed(self.move_history))  # Reverse the entire move history
         visible_moves = reversed_move_history[start_index:end_index]  # Make sure you get the right slice of the move history to display
-    
+
         # Draw each of the visible moves
         for i, text in enumerate(reversed(visible_moves)):
             move_surf = self.small_font.render(text, True, self.font_color)
