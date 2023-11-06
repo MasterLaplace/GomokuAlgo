@@ -1,0 +1,9 @@
+# Line endings
+* text eol=lf
+
+# Binary files
+*.jpg binary
+*.png binary
+
+# Handling of Python-specific files
+*.py linguist-language=Python
