@@ -85,7 +85,7 @@ class Command:
             print("ERROR message - unsupported size or other error")
 
     @staticmethod
-    def turn(game: Game, brain: Brain, x: int, y: int):
+    def turn(game: Game, brain: Brain, x: int, y: int) -> tuple[int, int]:
         try:
             game.turn(x, y)
         except Game.Error as error:
@@ -94,15 +94,22 @@ class Command:
 
         if game.nb_turn > 9:
             end = game.is_end()
+            width, height = game.getSize()
             if end == Game.CaseSate.PLAYER1:
                 print("WINNER 1")
-                return
+                Command.end(game, brain)
+                Command.start(game, brain, width)
+                return 0, 0
             elif end == Game.CaseSate.PLAYER2:
                 print("WINNER 2")
-                return
+                Command.end(game, brain)
+                Command.start(game, brain, width)
+                return 0, 0
+            # TODO: check if the board is full
         try:
             x, y = brain.findBestSolution(game.getCopyBoard(), game.getSize())
             game.turn(x, y)
+            return x, y
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
 

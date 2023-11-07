@@ -25,6 +25,7 @@ $(NAME):
 install:
 	@$(ECHO) $(BOLD) $(GREEN)"\n► INSTALL Gomoku 📦 !\n"$(DEFAULT)
 	@$(PYTHON) -m pip install --upgrade pip -q
+	@$(PIP) install pygame -q
 	@$(PIP) freeze | grep -v moddb > ./requirements.txt 2> /dev/null
 	@$(PIP) install -q -r ./requirements.txt
 	@$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" INSTALL Gomoku 📦"$(DEFAULT)

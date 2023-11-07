@@ -73,7 +73,7 @@ class Game:
     def rectstart(self, width: int, height: int):
         if  self.__started:
             raise Game.Error("Game is already started")
-        self.__size = width
+        self.__size = (width, height)
         self.__board = [[Game.CaseSate.EMPTY for _ in range(width)] for _ in range(height)]
         self.__started = True
 
