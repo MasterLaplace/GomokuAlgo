@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# vim:fenc=utf-8
+# File name: command.py
+# Author: M7T5M3P, MasterLaplace
+# Created on: 2023-11-6
 
 import sys
 
