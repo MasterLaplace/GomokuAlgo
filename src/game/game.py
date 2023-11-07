@@ -117,20 +117,20 @@ class Game:
         PLAYER1: The game is ended and the player 1 won
         PLAYER2: The game is ended and the player 2 won
         """
-        for i in range(0, self.__size[0] - 4):
-            for j in range(0, self.__size[1] - 4):
+        for i in range(0, self.__size[0]):
+            for j in range(0, self.__size[1]):
                 # check horizontal
-                if self.__board[i][j] != Game.CaseSate.EMPTY:
+                if j + 4 < self.__size[1] and self.__board[i][j] != Game.CaseSate.EMPTY:
                     if self.__board[i][j] == self.__board[i][j + 1] == self.__board[i][j + 2] == self.__board[i][j + 3] == self.__board[i][j + 4]:
-                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == 1 else Game.CaseSate.PLAYER2
+                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
                 # check vertical
-                if self.__board[i][j] != Game.CaseSate.EMPTY:
+                if i + 4 < self.__size[0] and self.__board[i][j] != Game.CaseSate.EMPTY:
                     if self.__board[i][j] == self.__board[i + 1][j] == self.__board[i + 2][j] == self.__board[i + 3][j] == self.__board[i + 4][j]:
-                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == 1 else Game.CaseSate.PLAYER2
+                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
                 # check diagonal
-                if self.__board[i][j] != Game.CaseSate.EMPTY:
+                if i + 4 < self.__size[0] and j + 4 < self.__size[1] and self.__board[i][j] != Game.CaseSate.EMPTY:
                     if self.__board[i][j] == self.__board[i + 1][j + 1] == self.__board[i + 2][j + 2] == self.__board[i + 3][j + 3] == self.__board[i + 4][j + 4]:
-                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == 1 else Game.CaseSate.PLAYER2
+                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
         return Game.CaseSate.EMPTY
 
     def undo(self):

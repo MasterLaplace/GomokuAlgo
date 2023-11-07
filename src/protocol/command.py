@@ -20,6 +20,8 @@ class Command:
         command_tab = [item for item in re.split(r'[ \t,=]', command) if item != '']
 
         try:
+            if not command_tab:
+                return
             match command_tab[0]:
                 # Mandatory commands
                 case "HELP":
@@ -61,8 +63,6 @@ class Command:
                 case "SUGGEST": # [x] [y]
                     print(f"SUGGEST {command_tab[1]},{command_tab[2]}")
                 # Error commands
-                case "":
-                    pass
                 case _:
                     print("ERROR Unknown command")
                     print("Please input HELP to get more information")
@@ -90,25 +90,24 @@ class Command:
             game.turn(x, y)
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
-            return
-
-        if game.nb_turn > 9:
-            end = game.is_end()
-            width, height = game.getSize()
-            if end == Game.CaseSate.PLAYER1:
+            return 0, 0
+        width, height = game.getSize()
+        if game.nb_turn > 8:
+            if game.is_end() == Game.CaseSate.PLAYER1:
                 print("WINNER 1")
                 Command.end(game, brain)
                 Command.start(game, brain, width)
                 return 0, 0
-            elif end == Game.CaseSate.PLAYER2:
-                print("WINNER 2")
-                Command.end(game, brain)
-                Command.start(game, brain, width)
-                return 0, 0
-            # TODO: check if the board is full
+
         try:
             x, y = brain.findBestSolution(game.getCopyBoard(), game.getSize())
             game.turn(x, y)
+            if game.nb_turn > 8:
+                if game.is_end() == Game.CaseSate.PLAYER2:
+                    print("WINNER 2")
+                    Command.end(game, brain)
+                    Command.start(game, brain, width)
+                    return 0, 0
             return x, y
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
