@@ -1,21 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# vim:fenc=utf-8
-# File name: brain.py
-# Author: MasterLaplace
-# Created on: 2023-11-7
-
-from random import randint
+import math
+import random
 from enum import Enum
 from game.game import Game
 
 class Brain:
-    """_summary_ The brain of the client
-    """
-
     class CommandType(Enum):
-        """_summary_ Enum for command type
-        """
         UNKNOWN = 0
         ERROR = 1
         MESSAGE = 2
@@ -23,17 +12,15 @@ class Brain:
         SUGGEST = 4
 
     def __init__(self):
-        self.name = "MinMaxBrain"
+        self.name = "MonteCarloBrain"
         self.version = "0.1.0"
         self.author = "Enzotekrennes;MasterLaplace"
         self.country = "France"
 
     def start(self):
         print("OK - everything is good")
-        # TODO: Initialize the brain
 
     def restart(self):
-        # TODO: Restart the brain
         pass
 
     def about(self):
@@ -41,161 +28,100 @@ class Brain:
 
     @staticmethod
     def isMovesLeft(board: list[list[str]], size: tuple[int, int]) -> bool:
-        """_summary_ Check if there are moves left on the board
-
-        Args:
-            board (list[list[str]]): _description_ The board of the game
-            size (tuple[int, int]): _description_ The size of the board
-
-        Returns:
-            bool: _description_ True if there are moves left, False otherwise
-        """
-
-        for i in range(0, size[0]) :
-            for j in range(0, size[1]) :
+        for i in range(size[0]):
+            for j in range(size[1]):
                 if board[i][j] == Game.CaseSate.EMPTY:
                     return True
         return False
 
     @staticmethod
     def evaluate(board: list[list[str]], size: tuple[int, int]) -> Game.CaseSate:
-        for i in range(0, size[0]):
-            for j in range(0, size[1]):
-                # check horizontal
+        for i in range(size[0]):
+            for j in range(size[1]):
                 if j + 4 < size[1]:
                     if board[i][j] == board[i][j + 1] == board[i][j + 2] == board[i][j + 3] == board[i][j + 4]:
                         return Game.CaseSate.PLAYER1 if board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
-                # check vertical
                 if i + 4 < size[0]:
                     if board[i][j] == board[i + 1][j] == board[i + 2][j] == board[i + 3][j] == board[i + 4][j]:
                         return Game.CaseSate.PLAYER1 if board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
-                # check diagonal
                 if i + 4 < size[0] and j + 4 < size[1]:
                     if board[i][j] == board[i + 1][j + 1] == board[i + 2][j + 2] == board[i + 3][j + 3] == board[i + 4][j + 4]:
                         return Game.CaseSate.PLAYER1 if board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
-        # Else if none of them have won then return EMPTY
         return Game.CaseSate.EMPTY
 
-    @staticmethod
-    def minimax(board: list[list[str]], size: tuple[int, int], depth: int, isMax: bool) -> int:
-        """_summary_ Minimax algorithm to find the best solution
-
-        Args:
-            board (list[list[str]]): _description_ The board of the game
-            size (tuple[int, int]): _description_ The size of the board
-            depth (int): _description_ The depth of the algorithm (0 at the beginning)
-            isMax (bool): _description_ True if the algorithm is in the maximizer state, False otherwise
-
-        Returns:
-            int: _description_ The best score for the next turn
-        """
-        score = Brain.evaluate(board, size)
-
-        # If Maximizer has won the game return his/her
-        # evaluated score
-        if score == Game.CaseSate.PLAYER1:
-            return 10
-
-        # If Minimizer has won the game return his/her
-        # evaluated score
-        if score == Game.CaseSate.PLAYER2:
-            return -10
-
-        # If there are no more moves and no winner then
-        # it is a tie
-        if Brain.isMovesLeft(board, size) == False:
-            return 0
-
-        # If this maximizer's move
-        if isMax:
-            best = -1000
-
-            # Traverse all cells
-            for i in range(0, size[0]):
-                for j in range(0, size[1]):
-
-                    # Check if cell is empty
-                    if board[i][j] == Game.CaseSate.EMPTY:
-
-                        # Make the move
-                        board[i][j] = Game.CaseSate.PLAYER1
-
-                        # Call minimax recursively and choose
-                        # the maximum value
-                        best = max(best, Brain.minimax(board, size, depth + 1, not isMax))
-
-                        # Undo the move
-                        board[i][j] = Game.CaseSate.EMPTY
-            return best
-
-        # If this minimizer's move
-        else :
-            best = 1000
-
-            # Traverse all cells
-            for i in range(0, size[0]):
-                for j in range(0, size[1]):
-
-                    # Check if cell is empty
-                    if board[i][j] == Game.CaseSate.EMPTY:
-
-                        # Make the move
-                        board[i][j] = Game.CaseSate.PLAYER2
-
-                        # Call minimax recursively and choose
-                        # the minimum value
-                        best = min(best, Brain.minimax(board, size, depth + 1, not isMax))
-
-                        # Undo the move
-                        board[i][j] = Game.CaseSate.EMPTY
-            return best
-
     def findBestSolution(self, board: list[list[Game.CaseSate]], size: tuple[int, int]) -> tuple[int, int]:
-        """_summary_ Find the best solution for the next turn
+        simulations = 1000
+        root = Node(board, size)
 
-        __description__ Find the best solution for the next turn by using the minimax algorithm
+        for _ in range(simulations):
+            selected_node = self.selectAndExpand(root)
+            simulation_result = self.simulate(selected_node)
+            self.backpropagate(selected_node, simulation_result)
 
-        __param__ board: The board of the game (list[list[PLAYER1, PLAYER2, EMPTY]])
-        __param__ size: The size of the board (tuple(x, y))
+        best_child = max(root.children, key=lambda child: child.visits)
+        return best_child.move
 
-        __return__ tuple[int, int]: The best solution for the next turn
-        """
-        bestVal = -1000
-        bestMove = (-1, -1)
+    def selectAndExpand(self, node: 'Node') -> 'Node':
+        while not node.is_terminal() and node.is_fully_expanded():
+            node = node.select_child()
 
-        # Traverse all cells, evaluate minimax function for
-        # all empty cells. And return the cell with optimal
-        # value.
-        for i in range(0, size[0]):
-            for j in range(0, size[1]):
+        if not node.is_terminal():
+            node = node.expand()
 
-                # Check if cell is empty
-                if board[i][j] == Game.CaseSate.EMPTY:
+        return node
 
-                    # Make the move
-                    board[i][j] = Game.CaseSate.PLAYER1
+    def simulate(self, node: 'Node') -> int:
+        simulation_board = [row.copy() for row in node.state]
 
-                    # compute evaluation function for this
-                    # move.
-                    moveVal = Brain.minimax(board, size, 0, False)
+        while True:
+            result = Brain.evaluate(simulation_board, node.size)
+            if result != Game.CaseSate.EMPTY:
+                return 1 if result == Game.CaseSate.PLAYER1 else -1
 
-                    # Undo the move
-                    board[i][j] = Game.CaseSate.EMPTY
+            legal_moves = [(i, j) for i in range(node.size[0]) for j in range(node.size[1]) if simulation_board[i][j] == Game.CaseSate.EMPTY]
+            if legal_moves:
+                move = random.choice(legal_moves)
+                simulation_board[move[0]][move[1]] = Game.CaseSate.PLAYER1
+            else:
+                return 0
 
-                    # If the value of the current move is
-                    # more than the best value, then update
-                    # best
-                    if moveVal > bestVal:
-                        bestMove = (i, j)
-                        bestVal = moveVal
+    def backpropagate(self, node: 'Node', result: int):
+        while node is not None:
+            node.update(result)
+            node = node.parent
 
-        print(f"{bestMove[0]},{bestMove[1]}")
-        return bestMove
+class Node:
+    def __init__(self, state: list[list[Game.CaseSate]], size: tuple[int, int], move: tuple[int, int] = None, parent: 'Node' = None):
+        self.state = state
+        self.size = size
+        self.move = move
+        self.parent = parent
+        self.children = []
+        self.visits = 0
+        self.wins = 0
 
-    def sendCommand(self):
-        # TODO: Send command to the protocol
-        pass
+    def is_terminal(self) -> bool:
+        return Brain.evaluate(self.state, self.size) != Game.CaseSate.EMPTY or not Brain.isMovesLeft(self.state, self.size)
 
-    def end(self):
-        # TODO: Terminate the brain
-        pass
+    def is_fully_expanded(self) -> bool:
+        return len(self.children) == len([(i, j) for i in range(self.size[0]) for j in range(self.size[1]) if self.state[i][j] == Game.CaseSate.EMPTY])
+
+    def select_child(self) -> 'Node':
+        exploration_constant = 1.0 / math.sqrt(2.0)
+        return max(self.children, key=lambda child: (child.wins / child.visits) + exploration_constant * math.sqrt(math.log(self.visits) / child.visits))
+
+    def expand(self) -> 'Node':
+        legal_moves = [(i, j) for i in range(self.size[0]) for j in range(self.size[1]) if self.state[i][j] == Game.CaseSate.EMPTY]
+        if legal_moves:
+            move = random.choice(legal_moves)
+            new_state = [row.copy() for row in self.state]
+            new_state[move[0]][move[1]] = Game.CaseSate.PLAYER1
+            child = Node(new_state, self.size, move, self)
+            self.children.append(child)
+            return child
+        return self
+
+    def update(self, result: int):
+        self.visits += 1
+        self.wins += result
+
