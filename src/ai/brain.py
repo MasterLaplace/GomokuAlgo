@@ -14,7 +14,7 @@ class Brain:
     def __init__(self):
         self.name = "MonteCarloBrain"
         self.version = "0.1.0"
-        self.author = "Enzotekrennes,MasterLaplace"
+        self.author = "Enzotekrennes;MasterLaplace"
         self.country = "France"
 
     def start(self):
