@@ -26,6 +26,21 @@ class Game:
             self.message = message
             super().__init__(self.message)
 
+    class End(Exception):
+        """_summary_ Base class for other exceptions
+        """
+
+        class EndType(Enum):
+            """_summary_ Enum for end type
+            """
+            WIN = 0
+            DRAW = 1
+            LOSE = 2
+
+        def __init__(self, message: str, end_type: EndType):
+            self.message = end_type.name + " - " + message
+            super().__init__(self.message)
+
     def __init__(self):
         self.__board: list[list[Game.CaseSate]] = []
         self.__turn: Game.CaseSate = Game.CaseSate.PLAYER1
@@ -117,8 +132,11 @@ class Game:
         PLAYER1: The game is ended and the player 1 won
         PLAYER2: The game is ended and the player 2 won
         """
+        empty_case = 0
         for i in range(0, self.__size[0]):
             for j in range(0, self.__size[1]):
+                if self.__board[i][j] == Game.CaseSate.EMPTY:
+                    empty_case += 1
                 # check horizontal
                 if j + 4 < self.__size[1] and self.__board[i][j] != Game.CaseSate.EMPTY:
                     if self.__board[i][j] == self.__board[i][j + 1] == self.__board[i][j + 2] == self.__board[i][j + 3] == self.__board[i][j + 4]:
@@ -131,6 +149,8 @@ class Game:
                 if i + 4 < self.__size[0] and j + 4 < self.__size[1] and self.__board[i][j] != Game.CaseSate.EMPTY:
                     if self.__board[i][j] == self.__board[i + 1][j + 1] == self.__board[i + 2][j + 2] == self.__board[i + 3][j + 3] == self.__board[i + 4][j + 4]:
                         return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
+        if empty_case == 0:
+            return Game.End.EndType("Too sad", Game.End.EndType.DRAW)
         return Game.CaseSate.EMPTY
 
     def undo(self):

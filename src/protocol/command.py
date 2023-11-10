@@ -94,20 +94,18 @@ class Command:
         width, height = game.getSize()
         if game.nb_turn > 8:
             if game.is_end() == Game.CaseSate.PLAYER1:
-                print("WINNER 1")
                 Command.end(game, brain)
                 Command.start(game, brain, width)
-                return 0, 0
+                raise Game.End("PLAYER 1", Game.End.EndType.WIN)
 
         try:
             x, y = brain.findBestSolution(game.getCopyBoard(), game.getSize())
             game.turn(x, y)
             if game.nb_turn > 8:
                 if game.is_end() == Game.CaseSate.PLAYER2:
-                    print("WINNER 2")
                     Command.end(game, brain)
                     Command.start(game, brain, width)
-                    return 0, 0
+                    raise Game.End("PLAYER 2", Game.End.EndType.WIN)
             return x, y
         except Game.Error as error:
             print(f"ERROR message - {error.message}")

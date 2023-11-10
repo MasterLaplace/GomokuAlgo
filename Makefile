@@ -10,7 +10,7 @@
 -include .env
 export
 
-NAME	= pbrain-gomoku
+NAME	= pbrain-gomoku-ai
 
 PYTHON	= python3
 

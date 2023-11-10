@@ -140,16 +140,28 @@ class BoardGame:
 
     def play_a_turn(self, x: int, y: int):
         if self.game_matrix[y][x] is None:
-            self.game_matrix[y][x] = self.current_player
-            # Log the move with a shifted position because the visual offset doesn't change matrix coordinates
-            self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
-            self.current_player = (self.current_player + 1) % 2  # Switch players
-            self.move += 1
-            x, y = Command.turn(self.__game, self.__brain, x, y)
-            self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
-            self.game_matrix[y][x] = self.current_player
-            self.current_player = (self.current_player + 1) % 2  # Switch players
-            self.move += 1
+            try:
+                self.game_matrix[y][x] = self.current_player
+                # Log the move with a shifted position because the visual offset doesn't change matrix coordinates
+                self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
+                self.current_player = (self.current_player + 1) % 2  # Switch players
+                self.move += 1
+                x, y = Command.turn(self.__game, self.__brain, x, y)
+                self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
+                self.game_matrix[y][x] = self.current_player
+                self.current_player = (self.current_player + 1) % 2  # Switch players
+                self.move += 1
+            except Game.End as e:
+                print("END")
+                print(e.message)
+                self.game_started = False
+                self.move = 0
+                self.move_history = []
+                self.current_player = 0
+                self.game_matrix = []
+                self.__game.end()
+                self.__brain.end()
+                self.run()
 
     def draw_setup_screen(self):
         self.screen.fill(self.bg_color)

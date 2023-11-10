@@ -25,6 +25,11 @@ if __name__ == "__main__":
         while True:
             try:
                 Command.manage_command(game, brain, input("Please input command: "))
+            except Game.End as e:
+                print("END")
+                print(e.message)
+                game.end()
+                brain.end()
             except KeyboardInterrupt:
                 print("\nUnplugging the brain")
                 break
