@@ -72,6 +72,8 @@ class Command:
         except ValueError:
             print("ERROR Invalid command")
             print("Please input HELP to get more information")
+        except Game.Error as error:
+            print(f"ERROR message - {error.message}")
 
     @staticmethod
     def start(game: Game, brain: Brain, size: int):
@@ -90,7 +92,9 @@ class Command:
             game.turn(x, y)
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
-            return 0, 0
+            if error.error_type == Game.Error.ErrorType.FORBIDEN:
+                raise Game.End("PLAYER 2", Game.End.EndType.WIN)
+            raise Game.Error(error.message)
         width, height = game.getSize()
         if game.nb_turn > 8:
             if game.is_end() == Game.CaseSate.PLAYER1:

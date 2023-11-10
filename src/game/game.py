@@ -22,8 +22,13 @@ class Game:
         """_summary_ Base class for other exceptions
         """
 
-        def __init__(self, message: str):
+        class ErrorType(Enum):
+            FORBIDEN = 0
+            INVALID = 1
+
+        def __init__(self, message: str, error_type: ErrorType = ErrorType.INVALID):
             self.message = message
+            self.error_type = error_type
             super().__init__(self.message)
 
     class End(Exception):
@@ -110,7 +115,7 @@ class Game:
             self.__turn = Game.CaseSate.PLAYER1 if self.__turn == Game.CaseSate.PLAYER2 else Game.CaseSate.PLAYER2
         else:
             print("ERROR message - field is not empty")
-            raise Game.Error("Field is not empty")
+            raise Game.Error("Field is not empty", Game.Error.ErrorType.FORBIDEN)
 
     def begin(self, x: int, y: int):
         if self.nb_turn == 0:

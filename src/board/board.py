@@ -162,6 +162,8 @@ class BoardGame:
                 self.__game.end()
                 self.__brain.end()
                 self.run()
+            except Game.Error as error:
+                print(f"ERROR message - {error.message}")
 
     def draw_setup_screen(self):
         self.screen.fill(self.bg_color)
