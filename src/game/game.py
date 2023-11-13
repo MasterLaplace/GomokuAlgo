@@ -22,8 +22,28 @@ class Game:
         """_summary_ Base class for other exceptions
         """
 
-        def __init__(self, message: str):
+        class ErrorType(Enum):
+            FORBIDEN = 0
+            INVALID = 1
+
+        def __init__(self, message: str, error_type: ErrorType = ErrorType.INVALID):
             self.message = message
+            self.error_type = error_type
+            super().__init__(self.message)
+
+    class End(Exception):
+        """_summary_ Base class for other exceptions
+        """
+
+        class EndType(Enum):
+            """_summary_ Enum for end type
+            """
+            WIN = 0
+            DRAW = 1
+            LOSE = 2
+
+        def __init__(self, message: str, end_type: EndType):
+            self.message = end_type.name + " - " + message
             super().__init__(self.message)
 
     def __init__(self):
@@ -73,7 +93,7 @@ class Game:
     def rectstart(self, width: int, height: int):
         if  self.__started:
             raise Game.Error("Game is already started")
-        self.__size = width
+        self.__size = (width, height)
         self.__board = [[Game.CaseSate.EMPTY for _ in range(width)] for _ in range(height)]
         self.__started = True
 
@@ -95,7 +115,7 @@ class Game:
             self.__turn = Game.CaseSate.PLAYER1 if self.__turn == Game.CaseSate.PLAYER2 else Game.CaseSate.PLAYER2
         else:
             print("ERROR message - field is not empty")
-            raise Game.Error("Field is not empty")
+            raise Game.Error("Field is not empty", Game.Error.ErrorType.FORBIDEN)
 
     def begin(self, x: int, y: int):
         if self.nb_turn == 0:
@@ -117,20 +137,25 @@ class Game:
         PLAYER1: The game is ended and the player 1 won
         PLAYER2: The game is ended and the player 2 won
         """
-        for i in range(0, self.__size[0] - 4):
-            for j in range(0, self.__size[1] - 4):
+        empty_case = 0
+        for i in range(0, self.__size[0]):
+            for j in range(0, self.__size[1]):
+                if self.__board[i][j] == Game.CaseSate.EMPTY:
+                    empty_case += 1
                 # check horizontal
-                if self.__board[i][j] != Game.CaseSate.EMPTY:
+                if j + 4 < self.__size[1] and self.__board[i][j] != Game.CaseSate.EMPTY:
                     if self.__board[i][j] == self.__board[i][j + 1] == self.__board[i][j + 2] == self.__board[i][j + 3] == self.__board[i][j + 4]:
-                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == 1 else Game.CaseSate.PLAYER2
+                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
                 # check vertical
-                if self.__board[i][j] != Game.CaseSate.EMPTY:
+                if i + 4 < self.__size[0] and self.__board[i][j] != Game.CaseSate.EMPTY:
                     if self.__board[i][j] == self.__board[i + 1][j] == self.__board[i + 2][j] == self.__board[i + 3][j] == self.__board[i + 4][j]:
-                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == 1 else Game.CaseSate.PLAYER2
+                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
                 # check diagonal
-                if self.__board[i][j] != Game.CaseSate.EMPTY:
+                if i + 4 < self.__size[0] and j + 4 < self.__size[1] and self.__board[i][j] != Game.CaseSate.EMPTY:
                     if self.__board[i][j] == self.__board[i + 1][j + 1] == self.__board[i + 2][j + 2] == self.__board[i + 3][j + 3] == self.__board[i + 4][j + 4]:
-                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == 1 else Game.CaseSate.PLAYER2
+                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
+        if empty_case == 0:
+            return Game.End.EndType("Too sad", Game.End.EndType.DRAW)
         return Game.CaseSate.EMPTY
 
     def undo(self):

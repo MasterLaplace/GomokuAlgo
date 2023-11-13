@@ -20,6 +20,8 @@ class Command:
         command_tab = [item for item in re.split(r'[ \t,=]', command) if item != '']
 
         try:
+            if not command_tab:
+                return
             match command_tab[0]:
                 # Mandatory commands
                 case "HELP":
@@ -61,8 +63,6 @@ class Command:
                 case "SUGGEST": # [x] [y]
                     print(f"SUGGEST {command_tab[1]},{command_tab[2]}")
                 # Error commands
-                case "":
-                    pass
                 case _:
                     print("ERROR Unknown command")
                     print("Please input HELP to get more information")
@@ -72,6 +72,8 @@ class Command:
         except ValueError:
             print("ERROR Invalid command")
             print("Please input HELP to get more information")
+        except Game.Error as error:
+            print(f"ERROR message - {error.message}")
 
     @staticmethod
     def start(game: Game, brain: Brain, size: int):
@@ -85,24 +87,30 @@ class Command:
             print("ERROR message - unsupported size or other error")
 
     @staticmethod
-    def turn(game: Game, brain: Brain, x: int, y: int):
+    def turn(game: Game, brain: Brain, x: int, y: int) -> tuple[int, int]:
         try:
             game.turn(x, y)
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
-            return
+            if error.error_type == Game.Error.ErrorType.FORBIDEN:
+                raise Game.End("PLAYER 2", Game.End.EndType.WIN)
+            raise Game.Error(error.message)
+        width, height = game.getSize()
+        if game.nb_turn > 8:
+            if game.is_end() == Game.CaseSate.PLAYER1:
+                Command.end(game, brain)
+                Command.start(game, brain, width)
+                raise Game.End("PLAYER 1", Game.End.EndType.WIN)
 
-        if game.nb_turn > 9:
-            end = game.is_end()
-            if end == Game.CaseSate.PLAYER1:
-                print("WINNER 1")
-                return
-            elif end == Game.CaseSate.PLAYER2:
-                print("WINNER 2")
-                return
         try:
             x, y = brain.findBestSolution(game.getCopyBoard(), game.getSize())
             game.turn(x, y)
+            if game.nb_turn > 8:
+                if game.is_end() == Game.CaseSate.PLAYER2:
+                    Command.end(game, brain)
+                    Command.start(game, brain, width)
+                    raise Game.End("PLAYER 2", Game.End.EndType.WIN)
+            return x, y
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
 

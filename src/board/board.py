@@ -13,8 +13,12 @@ except ImportError:
     print("Pygame not found. Please install it with \"pip install pygame\".")
     sys.exit()
 
+from protocol.command import Command
+from game.game import Game
+from ai.brain import Brain
+
 class BoardGame:
-    def __init__(self):
+    def __init__(self, game: Game, brain: Brain):
         pygame.init()
 
         self.cell_size = 40  # Size for each cell on the board
@@ -36,7 +40,7 @@ class BoardGame:
         self.input_box = pygame.Rect(self.game_width // 2 - 100, 300, 200, 50)
         self.input_text = ''
         self.clock = pygame.time.Clock()
-        self.board_size = None
+        self.board_size: int = 0
         self.game_started = False
         self.start_button = pygame.Rect(self.game_width // 2 - 50, 400, 100, 50)
         self.start_button_active = False
@@ -48,6 +52,11 @@ class BoardGame:
         self.frame_count = 0
         self.frame_rate = 60
         self.start_time = 5
+
+        self.__game = game
+        self.__brain = brain
+
+        self.run()
 
     def run(self):
         while not self.game_started:
@@ -85,6 +94,7 @@ class BoardGame:
                 if self.input_text.isdigit() and 4 < int(self.input_text) <= 20:
                     self.board_size = int(self.input_text)
                     self.game_started = True  # Start the game
+                    Command.start(self.__game, self.__brain, self.board_size)
                 else:
                     self.start_button_active = False  # Disable the start button
                     print("Please enter a valid board size (5-20).")  # Or show this message in the GUI
@@ -128,13 +138,32 @@ class BoardGame:
                 max_scroll_pos = max(0, len(self.move_history) - (self.game_height // (self.small_font.get_height() + 5)))
                 self.log_scroll_pos = min(self.log_scroll_pos + 1, max_scroll_pos)
 
-    def play_a_turn(self, x, y):
+    def play_a_turn(self, x: int, y: int):
         if self.game_matrix[y][x] is None:
-            self.game_matrix[y][x] = self.current_player
-            # Log the move with a shifted position because the visual offset doesn't change matrix coordinates
-            self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
-            self.current_player = (self.current_player + 1) % 2  # Switch players
-            self.move += 1
+            try:
+                self.game_matrix[y][x] = self.current_player
+                # Log the move with a shifted position because the visual offset doesn't change matrix coordinates
+                self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
+                self.current_player = (self.current_player + 1) % 2  # Switch players
+                self.move += 1
+                x, y = Command.turn(self.__game, self.__brain, x, y)
+                self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
+                self.game_matrix[y][x] = self.current_player
+                self.current_player = (self.current_player + 1) % 2  # Switch players
+                self.move += 1
+            except Game.End as e:
+                print("END")
+                print(e.message)
+                self.game_started = False
+                self.move = 0
+                self.move_history = []
+                self.current_player = 0
+                self.game_matrix = []
+                self.__game.end()
+                self.__brain.end()
+                self.run()
+            except Game.Error as error:
+                print(f"ERROR message - {error.message}")
 
     def draw_setup_screen(self):
         self.screen.fill(self.bg_color)
@@ -270,6 +299,3 @@ class BoardGame:
             move_surf = self.small_font.render(text, True, self.font_color)
             y_position = 30 + (self.visible_count - i) * (self.small_font.get_height())  # Calculate y position
             surface.blit(move_surf, (10, y_position))
-
-game = BoardGame()
-game.run()
