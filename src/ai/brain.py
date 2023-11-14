@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 # File name: brain.py
-# Author: MasterLaplace
+# Author: MasterLaplace;Enzotekrennes
 # Created on: 2023-11-7
 
 from enum import Enum
