@@ -16,7 +16,7 @@ PYTHON	= python3
 
 PIP		= pip3
 
-all: install $(NAME)
+all: $(NAME)
 
 $(NAME):
 	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
