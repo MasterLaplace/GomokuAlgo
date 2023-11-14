@@ -16,10 +16,15 @@ PYTHON	= python3
 
 PIP		= pip3
 
+OPTI		=	-Ofast -march=native -mtune=native -flto -fuse-linker-plugin \
+				-pipe -fomit-frame-pointer -fopenmp -fprefetch-loop-arrays \
+				-fno-stack-protector -fno-ident -fno-asynchronous-unwind-tables
+
 all: $(NAME)
 
 $(NAME):
 	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
+	@gcc -o minmax ./src/ai/minmax.c $(OPTI)
 	@ln -sf ./src/main.py $(NAME)
 
 install:
@@ -48,6 +53,7 @@ clean:
 
 fclean: clean
 	@$(RM) $(NAME)
+	@$(RM) minmax
 	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" FCLEAN Gomoku 🧻"$(DEFAULT)
 
 re: clean all
