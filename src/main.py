@@ -6,7 +6,6 @@
 # Created on: 2023-11-6
 
 from protocol.command import Command
-from board.board import BoardGame
 from game.game import Game
 from ai.brain import Brain
 import sys
@@ -17,6 +16,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         try:
+            from board.board import BoardGame
             BoardGame(game, brain)
         except KeyboardInterrupt:
             print("\nUnplugging the brain")
@@ -24,14 +24,18 @@ if __name__ == "__main__":
     else:
         while True:
             try:
-                Command.manage_command(game, brain, input("Please input command: "))
+                command = input("Please input command: ")
+                Command.manage_command(game, brain, command)
             except Game.End as e:
                 print("END")
                 print(e.message)
                 game.end()
                 brain.end()
-            except KeyboardInterrupt:
-                print("\nUnplugging the brain")
-                break
+            # except KeyboardInterrupt:
+            #     print("\nUnplugging the brain")
+            #     break
             except EOFError:
+                sys.exit(0)
+            except:
+                print("ERROR")
                 sys.exit(0)
