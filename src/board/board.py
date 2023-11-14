@@ -11,7 +11,6 @@ try:
     import pygame
 except ImportError:
     print("Pygame not found. Please install it with \"pip install pygame\".")
-    sys.exit()
 
 from protocol.command import Command
 from game.game import Game

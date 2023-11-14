@@ -114,7 +114,6 @@ class Game:
             self.nb_turn += 1
             self.__turn = Game.CaseSate.PLAYER1 if self.__turn == Game.CaseSate.PLAYER2 else Game.CaseSate.PLAYER2
         else:
-            print("ERROR message - field is not empty")
             raise Game.Error("Field is not empty", Game.Error.ErrorType.FORBIDEN)
 
     def begin(self, x: int, y: int):
@@ -124,7 +123,6 @@ class Game:
             self.nb_turn = 1
             self.__turn = Game.CaseSate.PLAYER1
         else:
-            print("ERROR message - game has already started")
             raise Game.Error("Game has already started")
 
     def is_end(self) -> CaseSate:
@@ -142,20 +140,25 @@ class Game:
             for j in range(0, self.__size[1]):
                 if self.__board[i][j] == Game.CaseSate.EMPTY:
                     empty_case += 1
+                    continue
                 # check horizontal
-                if j + 4 < self.__size[1] and self.__board[i][j] != Game.CaseSate.EMPTY:
+                if j + 4 < self.__size[1]:
                     if self.__board[i][j] == self.__board[i][j + 1] == self.__board[i][j + 2] == self.__board[i][j + 3] == self.__board[i][j + 4]:
                         return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
                 # check vertical
-                if i + 4 < self.__size[0] and self.__board[i][j] != Game.CaseSate.EMPTY:
+                if i + 4 < self.__size[0]:
                     if self.__board[i][j] == self.__board[i + 1][j] == self.__board[i + 2][j] == self.__board[i + 3][j] == self.__board[i + 4][j]:
                         return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
                 # check diagonal
-                if i + 4 < self.__size[0] and j + 4 < self.__size[1] and self.__board[i][j] != Game.CaseSate.EMPTY:
+                if i + 4 < self.__size[0] and j + 4 < self.__size[1]:
                     if self.__board[i][j] == self.__board[i + 1][j + 1] == self.__board[i + 2][j + 2] == self.__board[i + 3][j + 3] == self.__board[i + 4][j + 4]:
                         return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
+                # check anti-diagonal
+                if i + 4 < self.__size[0] and j - 4 >= 0:
+                    if self.__board[i][j] == self.__board[i + 1][j - 1] == self.__board[i + 2][j - 2] == self.__board[i + 3][j - 3] == self.__board[i + 4][j - 4]:
+                        return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
         if empty_case == 0:
-            return Game.End.EndType("Too sad", Game.End.EndType.DRAW)
+            return Game.End("Too sad", Game.End.EndType.DRAW)
         return Game.CaseSate.EMPTY
 
     def undo(self):

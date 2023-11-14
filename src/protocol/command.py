@@ -113,6 +113,9 @@ class Command:
             return x, y
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
+            if error.error_type == Game.Error.ErrorType.FORBIDEN:
+                raise Game.End("PLAYER 1", Game.End.EndType.WIN)
+            raise Game.Error(error.message)
 
     @staticmethod
     def begin(game: Game, brain: Brain):
