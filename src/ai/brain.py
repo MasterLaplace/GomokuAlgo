@@ -49,11 +49,9 @@ class Brain:
         Returns:
             bool: _description_ True if there are moves left, False otherwise
         """
-
         for i in range(size[0]) :
-            for j in range(size[1]) :
-                if board[i][j] == Game.CaseSate.EMPTY:
-                    return True
+            if Game.CaseSate.EMPTY in board[i]:
+                return True
         return False
 
     @staticmethod

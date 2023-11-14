@@ -34,4 +34,4 @@ if __name__ == "__main__":
                 print("\nUnplugging the brain")
                 break
             except EOFError:
-                print("")
+                sys.exit(0)
