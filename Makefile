@@ -22,20 +22,6 @@ $(NAME):
 	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
 	@ln -sf ./src/main.py $(NAME)
 
-install:
-	@$(ECHO) $(BOLD) $(GREEN)"\n► INSTALL Gomoku 📦 !\n"$(DEFAULT)
-	@$(PYTHON) -m pip install --upgrade pip -q
-	@$(PIP) install pygame -q
-	@$(PIP) freeze | grep -v moddb > ./requirements.txt 2> /dev/null
-	@$(PIP) install -q -r ./requirements.txt
-	@$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" INSTALL Gomoku 📦"$(DEFAULT)
-
-lint:
-	@$(PYTHON) -m pylint src/*.py
-
-type:
-	@$(PYTHON) -m mypy src/*.py
-
 clean:
 	@$(RM) __pycache__
 	@find -type f -name ".pytest_cache" -delete
@@ -69,4 +55,4 @@ version:
 	@$(ECHO) $(BOLD) $(GREEN)"\n► GOMOKU VERSION 📜 !"$(DEFAULT)
 	@$(ECHO) $(BOLD) $(LIGHT_BLUE)"\n► Gomoku: $(shell cat VERSION)"$(DEFAULT)
 
-.PHONY: all install lint type clean
+.PHONY: all clean

@@ -8,6 +8,8 @@
 from enum import Enum
 from game.game import Game
 
+import random
+
 class Brain:
     """_summary_ The brain of the client
     """
@@ -148,27 +150,7 @@ class Brain:
 
         __return__ tuple[int, int]: The best solution for the next turn
         """
-        bestVal: int = -1000
-        bestMove: tuple[int, int] = (-1, -1)
-        depth_limit: int = 2
-
-        for i in range(size[0]):
-            for j in range(size[1]):
-                if board[i][j] == Game.CaseSate.EMPTY:
-                    board[i][j] = Game.CaseSate.PLAYER1
-                    moveVal = Brain.minimax(board, size, depth_limit, False, -float('inf'), float('inf'))
-                    board[i][j] = Game.CaseSate.EMPTY
-
-                    if moveVal > bestVal:
-                        bestMove = (i, j)
-                        bestVal = moveVal
-
-        if (bestMove[0] == -1 and bestMove[1] == -1):
-            for i in range(size[0]):
-                for j in range(size[1]):
-                    if board[i][j] == Game.CaseSate.EMPTY:
-                        bestMove = (i, j)
-                        break
+        bestMove: tuple[int, int] = (random.randint(0, size[0] - 1), random.randint(0, size[1] - 1))
         print(f"{bestMove[0]},{bestMove[1]}")
         return bestMove
 

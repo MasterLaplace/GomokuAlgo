@@ -14,26 +14,18 @@ if __name__ == "__main__":
     game = Game()
     brain = Brain()
 
-    if len(sys.argv) > 1:
+    while True:
         try:
-            from board.board import BoardGame
-            BoardGame(game, brain)
+            command = input("Please input command: ")
+            Command.manage_command(game, brain, command)
+        except Game.End as e:
+            print("END")
+            print(e.message)
+            game.end()
+            brain.end()
         except KeyboardInterrupt:
-            print("\nUnplugging the brain")
+            # print("\nUnplugging the brain")
+            # break
             sys.exit(0)
-    else:
-        while True:
-            try:
-                command = input("Please input command: ")
-                Command.manage_command(game, brain, command)
-            except Game.End as e:
-                print("END")
-                print(e.message)
-                game.end()
-                brain.end()
-            except KeyboardInterrupt:
-                # print("\nUnplugging the brain")
-                # break
-                sys.exit(0)
-            except EOFError:
-                sys.exit(0)
+        except EOFError:
+            sys.exit(0)
