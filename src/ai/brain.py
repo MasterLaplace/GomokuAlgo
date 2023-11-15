@@ -150,7 +150,7 @@ class Brain:
         """
         bestVal: int = -1000
         bestMove: tuple[int, int] = (-1, -1)
-        depth_limit: int = 4
+        depth_limit: int = 2
 
         for i in range(size[0]):
             for j in range(size[1]):

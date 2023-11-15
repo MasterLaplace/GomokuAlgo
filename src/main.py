@@ -31,11 +31,9 @@ if __name__ == "__main__":
                 print(e.message)
                 game.end()
                 brain.end()
-            # except KeyboardInterrupt:
-            #     print("\nUnplugging the brain")
-            #     break
-            except EOFError:
+            except KeyboardInterrupt:
+                # print("\nUnplugging the brain")
+                # break
                 sys.exit(0)
-            except:
-                print("ERROR")
+            except EOFError:
                 sys.exit(0)
