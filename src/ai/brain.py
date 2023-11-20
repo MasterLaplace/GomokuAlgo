@@ -6,7 +6,7 @@
 # Created on: 2023-11-7
 
 from enum import Enum
-from game.game import Game
+from src.game.game import Game
 
 import random
 

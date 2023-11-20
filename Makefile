@@ -20,7 +20,8 @@ all: $(NAME)
 
 $(NAME):
 	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
-	@ln -sf ./src/main.py $(NAME)
+	@cp ./src/main.py $(NAME)
+	@chmod +x $(NAME)
 
 clean:
 	@$(RM) __pycache__
