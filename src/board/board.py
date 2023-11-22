@@ -5,16 +5,14 @@
 # Author: M7T5M3P, MasterLaplace
 # Created on: 2023-11-6
 
-import sys
-
 try:
     import pygame
 except ImportError:
     print("Pygame not found. Please install it with \"pip install pygame\".")
 
-from protocol.command import Command
-from game.game import Game
-from ai.brain import Brain
+from src.protocol.command import Command
+from src.game.game import Game
+from src.ai.brain import Brain
 
 class BoardGame:
     def __init__(self, game: Game, brain: Brain):
@@ -62,7 +60,7 @@ class BoardGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                     pygame.quit()
-                    sys.exit()
+                    quit()
                 self.handle_setup_event(event)
 
             self.draw_setup_screen()
@@ -116,7 +114,7 @@ class BoardGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                     pygame.quit()
-                    sys.exit()
+                    quit()
                 self.handle_game_event(event)
             self.draw_board_screen()
 

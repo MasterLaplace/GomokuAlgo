@@ -16,41 +16,35 @@ PYTHON	= python3
 
 PIP		= pip3
 
+OPTI		=	-Ofast -march=native -mtune=native -flto \
+				-pipe -fomit-frame-pointer \
+				-fno-stack-protector -fno-ident -fno-asynchronous-unwind-tables
+
 all: $(NAME)
 
 $(NAME):
 	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
-	@ln -sf ./src/main.py $(NAME)
-
-install:
-	@$(ECHO) $(BOLD) $(GREEN)"\n► INSTALL Gomoku 📦 !\n"$(DEFAULT)
-	@$(PYTHON) -m pip install --upgrade pip -q
-	@$(PIP) install pygame -q
-	@$(PIP) freeze | grep -v moddb > ./requirements.txt 2> /dev/null
-	@$(PIP) install -q -r ./requirements.txt
-	@$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" INSTALL Gomoku 📦"$(DEFAULT)
-
-lint:
-	@$(PYTHON) -m pylint src/*.py
-
-type:
-	@$(PYTHON) -m mypy src/*.py
+	@gcc -o minmax ./src/ai/minmax.c $(OPTI)
+	@cp ./src/main.py $(NAME)
+	@chmod +x $(NAME)
 
 clean:
 	@$(RM) __pycache__
-	@find -type f -name ".pytest_cache" -delete
-	@find -type f -name ".mypy_cache" -delete
-	@find -type f -name "*.pyc" -delete
-	@find -type f -name "*.pyo" -delete
-	@find -type f -name "*~" -delete
-	@find -type f -name "requirements.txt" -delete
+	@find . -name ".pytest_cache" -delete
+	@find . -name ".mypy_cache" -delete
+	@find . -name "*.pyc" -delete
+	@find . -name "*.pyo" -delete
+	@find . -name "*~" -delete
+	@find . -name "requirements.txt" -delete
+	@(find . -type d -name "__pycache__" -exec rm -rf {} + 2> /dev/null || true)
 	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" CLEAN Gomoku 💨"$(DEFAULT)
 
 fclean: clean
 	@$(RM) $(NAME)
+	@$(RM) minmax
 	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" FCLEAN Gomoku 🧻"$(DEFAULT)
 
-re: clean all
+re: fclean all
 
 ## HELP MODE
 
@@ -69,4 +63,4 @@ version:
 	@$(ECHO) $(BOLD) $(GREEN)"\n► GOMOKU VERSION 📜 !"$(DEFAULT)
 	@$(ECHO) $(BOLD) $(LIGHT_BLUE)"\n► Gomoku: $(shell cat VERSION)"$(DEFAULT)
 
-.PHONY: all install lint type clean
+.PHONY: all clean

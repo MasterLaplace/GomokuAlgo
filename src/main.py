@@ -5,37 +5,33 @@
 # Author: MasterLaplace
 # Created on: 2023-11-6
 
-from protocol.command import Command
-from game.game import Game
-from ai.brain import Brain
+from src.protocol.command import Command
+from src.game.game import Game
+from src.ai.brain import Brain
+
 import sys
 
 if __name__ == "__main__":
     game = Game()
     brain = Brain()
 
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 2 and sys.argv[1] == "debug":
         try:
-            from board.board import BoardGame
+            from src.board.board import BoardGame
             BoardGame(game, brain)
         except KeyboardInterrupt:
             print("\nUnplugging the brain")
-            sys.exit(0)
     else:
         while True:
             try:
-                command = input("Please input command: ")
-                Command.manage_command(game, brain, command)
+                Command.manage_command(game, brain, input())
             except Game.End as e:
                 print("END")
                 print(e.message)
                 game.end()
                 brain.end()
-            # except KeyboardInterrupt:
-            #     print("\nUnplugging the brain")
-            #     break
+            except KeyboardInterrupt:
+                print("\nUnplugging the brain")
+                quit()
             except EOFError:
-                sys.exit(0)
-            except:
-                print("ERROR")
-                sys.exit(0)
+                quit()

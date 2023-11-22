@@ -5,11 +5,10 @@
 # Author: MasterLaplace
 # Created on: 2023-11-6
 
-from game.game import Game
-from ai.brain import Brain
+from src.game.game import Game
+from src.ai.brain import Brain
 
 import re
-import sys
 
 class Command:
     """_summary_ Parse the command from the protocol and call the corresponding function
@@ -132,18 +131,16 @@ class Command:
             board = game.getCopyBoard()
             player = Game.CaseSate(0)
             while True:
-                command = input("BOARD until DONE: ")
+                command = input()
                 if command == "DONE":
                     game.setBoard(board)
-                    if player == Game.CaseSate.PLAYER1:
-                        Command.turn(game, brain, 0, 0)
-                    else:
+                    if player == Game.CaseSate.PLAYER2:
                         Command.begin(game, brain)
                     break
-                command_tab = [item for item in re.split(r'[ \t,]', command) if item != '']
+                command_tab = [item for item in re.split(r'[ \t,=]', command) if item != '']
                 try:
                     player = Game.CaseSate(int(command_tab[2]))
-                    if player == Game.CaseSate.EMPTY or player == game.getTurn():
+                    if player == Game.CaseSate.EMPTY or player != game.getTurn():
                         raise ValueError
                     board[int(command_tab[0])][int(command_tab[1])] = player
                     game.setTurn(player)
@@ -164,7 +161,7 @@ class Command:
     def end(game: Game, brain: Brain):
         game.end()
         brain.end()
-        sys.exit(0)
+        quit()
 
     @staticmethod
     def about(brain: Brain):
