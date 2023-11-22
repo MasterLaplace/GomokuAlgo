@@ -24,6 +24,7 @@ all: $(NAME)
 
 $(NAME):
 	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
+	@gcc -o minmax ./src/ai/minmax.c $(OPTI)
 	@cp ./src/main.py $(NAME)
 	@chmod +x $(NAME)
 
