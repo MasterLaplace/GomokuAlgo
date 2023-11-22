@@ -13,7 +13,7 @@
 
 typedef unsigned char u_my_type;
 
-#define MAX_DEPTH 4
+#define MAX_DEPTH 2
 #define EMPTY (u_my_type)'0'
 #define PLAYER (u_my_type)'1'
 #define OPPONENT (u_my_type)'2'
