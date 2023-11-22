@@ -10,9 +10,9 @@ try:
 except ImportError:
     print("Pygame not found. Please install it with \"pip install pygame\".")
 
-from src.protocol.command import Command
-from src.game.game import Game
-from src.ai.brain import Brain
+from protocol.command import Command
+from game.game import Game
+from ai.brain import Brain
 
 class BoardGame:
     def __init__(self, game: Game, brain: Brain):

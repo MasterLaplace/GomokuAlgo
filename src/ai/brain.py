@@ -6,7 +6,7 @@
 # Created on: 2023-11-7
 
 from enum import Enum
-from src.game.game import Game
+from game.game import Game
 
 class Brain:
     """_summary_ The brain of the client

@@ -5,8 +5,8 @@
 # Author: MasterLaplace
 # Created on: 2023-11-6
 
-from src.game.game import Game
-from src.ai.brain import Brain
+from game.game import Game
+from ai.brain import Brain
 
 import re
 

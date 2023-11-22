@@ -5,9 +5,9 @@
 # Author: MasterLaplace
 # Created on: 2023-11-6
 
-from src.protocol.command import Command
-from src.game.game import Game
-from src.ai.brain import Brain
+from protocol.command import Command
+from game.game import Game
+from ai.brain import Brain
 
 import sys
 
@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 2 and sys.argv[1] == "debug":
         try:
-            from src.board.board import BoardGame
+            from board.board import BoardGame
             BoardGame(game, brain)
         except KeyboardInterrupt:
             print("\nUnplugging the brain")
