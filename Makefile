@@ -24,22 +24,8 @@ all: $(NAME)
 
 $(NAME):
 	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
-	@gcc -o minmax ./src/ai/minmax.c $(OPTI)
-	@ln -sf ./src/main.py $(NAME)
-
-install:
-	@$(ECHO) $(BOLD) $(GREEN)"\n► INSTALL Gomoku 📦 !\n"$(DEFAULT)
-	@$(PYTHON) -m pip install --upgrade pip -q
-	@$(PIP) install pygame -q
-	@$(PIP) freeze | grep -v moddb > ./requirements.txt 2> /dev/null
-	@$(PIP) install -q -r ./requirements.txt
-	@$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" INSTALL Gomoku 📦"$(DEFAULT)
-
-lint:
-	@$(PYTHON) -m pylint src/*.py
-
-type:
-	@$(PYTHON) -m mypy src/*.py
+	@cp ./src/main.py $(NAME)
+	@chmod +x $(NAME)
 
 clean:
 	@$(RM) __pycache__
@@ -56,7 +42,7 @@ fclean: clean
 	@$(RM) minmax
 	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" FCLEAN Gomoku 🧻"$(DEFAULT)
 
-re: clean all
+re: fclean all
 
 ## HELP MODE
 
@@ -75,4 +61,4 @@ version:
 	@$(ECHO) $(BOLD) $(GREEN)"\n► GOMOKU VERSION 📜 !"$(DEFAULT)
 	@$(ECHO) $(BOLD) $(LIGHT_BLUE)"\n► Gomoku: $(shell cat VERSION)"$(DEFAULT)
 
-.PHONY: all install lint type clean
+.PHONY: all clean
