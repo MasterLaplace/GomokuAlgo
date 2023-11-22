@@ -13,7 +13,7 @@
 
 typedef unsigned char u_my_type;
 
-#define MAX_DEPTH 2
+#define MAX_DEPTH 4
 #define EMPTY (u_my_type)'0'
 #define PLAYER (u_my_type)'1'
 #define OPPONENT (u_my_type)'2'
@@ -52,25 +52,25 @@ static bool isMovesLeft(board_t *board)
     return false;
 }
 
-static int evaluate(board_t *board)
-{
-    for (int i = 0; i < (int)HEIGHT; i++)
+static int evaluate(board_t *board) {
+    for (int i = 0; i < (int)HEIGHT; i++) {
         for (int j = 0; j < (int)WIDTH; j++) {
             if (AT(board) == EMPTY)
                 continue;
-            if (j + 4 < (int)WIDTH)
-                if (AT(board) == AT_H(1) == AT_H(2) == AT_H(3) == AT_H(4))
-                    return (AT(board) == PLAYER)?10:-10;
-            if (i + 4 < (int)HEIGHT)
-                if (AT(board) == AT_V(1) == AT_V(2) == AT_V(3) == AT_V(4))
-                    return (AT(board) == PLAYER)?10:-10;
-            if (i + 4 < (int)HEIGHT && j + 4 < (int)WIDTH)
-                if (AT(board) == AT_D(1) == AT_D(2) == AT_D(3) == AT_D(4))
-                    return (AT(board) == PLAYER)?10:-10;
-            if (i + 4 < (int)HEIGHT && j - 4 >= 0)
-                if (AT(board) == AT_A(1) == AT_A(2) == AT_A(3) == AT_A(4))
-                    return (AT(board) == PLAYER)?10:-10;
+
+            if (j + 4 < (int)WIDTH && AT(board) == AT_H(1) && AT(board) == AT_H(2) && AT(board) == AT_H(3) && AT(board) == AT_H(4))
+                return (AT(board) == PLAYER)?10:-10;
+
+            if (i + 4 < (int)HEIGHT && AT(board) == AT_V(1) && AT(board) == AT_V(2) && AT(board) == AT_V(3) && AT(board) == AT_V(4))
+                return (AT(board) == PLAYER)?10:-10;
+
+            if (i + 4 < (int)HEIGHT && j + 4 < (int)WIDTH && AT(board) == AT_D(1) && AT(board) == AT_D(2) && AT(board) == AT_D(3) && AT(board) == AT_D(4))
+                return (AT(board) == PLAYER)?10:-10;
+
+            if (i + 4 < (int)HEIGHT && j - 4 >= 0 && AT(board) == AT_A(1) && AT(board) == AT_A(2) && AT(board) == AT_A(3) && AT(board) == AT_A(4))
+                return (AT(board) == PLAYER)?10:-10;
         }
+    }
     return 0;
 }
 
