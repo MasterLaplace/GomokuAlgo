@@ -9,12 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdbool.h>
 #include <stdint.h>
 
 typedef unsigned char u_my_type;
 
-#define MAX_DEPTH 3
+#define MAX_DEPTH 4
 #define EMPTY (u_my_type)'0'
 #define PLAYER (u_my_type)'1'
 #define OPPONENT (u_my_type)'2'
@@ -27,6 +26,12 @@ typedef struct {
     u_my_type *board;
 } board_t;
 
+// bool type and values
+#define bool _Bool
+#define false 0
+#define true 1
+
+// min, max functions
 #define typeof __typeof__
 #define max(a,b) (a > b ? a : b)
 #define min(a,b) (a < b ? a : b)
