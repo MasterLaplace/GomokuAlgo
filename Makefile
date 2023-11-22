@@ -37,7 +37,7 @@ fclean: clean
 	@$(RM) $(NAME)
 	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" FCLEAN Gomoku 🧻"$(DEFAULT)
 
-re: clean all
+re: fclean all
 
 ## HELP MODE
 

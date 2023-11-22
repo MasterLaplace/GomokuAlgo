@@ -5,8 +5,8 @@
 # Author: MasterLaplace
 # Created on: 2023-11-6
 
-from game.game import Game
-from ai.brain import Brain
+from src.game.game import Game
+from src.ai.brain import Brain
 
 import re
 
@@ -131,7 +131,7 @@ class Command:
             board = game.getCopyBoard()
             player = Game.CaseSate(0)
             while True:
-                command = input("BOARD until DONE: ")
+                command = input()
                 if command == "DONE":
                     game.setBoard(board)
                     if player == Game.CaseSate.PLAYER1:

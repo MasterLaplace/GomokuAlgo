@@ -5,9 +5,9 @@
 # Author: MasterLaplace
 # Created on: 2023-11-6
 
-from protocol.command import Command
-from game.game import Game
-from ai.brain import Brain
+from src.protocol.command import Command
+from src.game.game import Game
+from src.ai.brain import Brain
 
 import sys
 
