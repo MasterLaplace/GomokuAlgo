@@ -9,7 +9,6 @@ from src.game.game import Game
 from src.ai.brain import Brain
 
 import re
-import sys
 
 class Command:
     """_summary_ Parse the command from the protocol and call the corresponding function
@@ -164,7 +163,7 @@ class Command:
     def end(game: Game, brain: Brain):
         game.end()
         brain.end()
-        sys.exit(0)
+        quit()
 
     @staticmethod
     def about(brain: Brain):

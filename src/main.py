@@ -8,24 +8,30 @@
 from src.protocol.command import Command
 from src.game.game import Game
 from src.ai.brain import Brain
+
 import sys
 
 if __name__ == "__main__":
     game = Game()
     brain = Brain()
 
-    while True:
+    if len(sys.argv) == 2 and sys.argv[1] == "debug":
         try:
-            command = input("Please input command: ")
-            Command.manage_command(game, brain, command)
-        except Game.End as e:
-            print("END")
-            print(e.message)
-            game.end()
-            brain.end()
+            from src.board.board import BoardGame
+            BoardGame(game, brain)
         except KeyboardInterrupt:
-            # print("\nUnplugging the brain")
-            # break
-            sys.exit(0)
-        except EOFError:
-            sys.exit(0)
+            print("\nUnplugging the brain")
+    else:
+        while True:
+            try:
+                Command.manage_command(game, brain, input("Please input command: "))
+            except Game.End as e:
+                print("END")
+                print(e.message)
+                game.end()
+                brain.end()
+            except KeyboardInterrupt:
+                print("\nUnplugging the brain")
+                quit()
+            except EOFError:
+                quit()
