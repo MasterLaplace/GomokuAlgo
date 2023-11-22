@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 2 and sys.argv[1] == "debug":
         try:
-            from board.board import BoardGame
+            from src.board.board import BoardGame
             BoardGame(game, brain)
         except KeyboardInterrupt:
             print("\nUnplugging the brain")

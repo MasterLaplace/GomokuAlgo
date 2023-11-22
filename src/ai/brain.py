@@ -8,6 +8,8 @@
 from enum import Enum
 from src.game.game import Game
 
+import subprocess
+
 class Brain:
     """_summary_ The brain of the client
     """
@@ -41,27 +43,25 @@ class Brain:
     @staticmethod
     def isMovesLeft(board: list[list[str]], size: tuple[int, int]) -> bool:
         """_summary_ Check if there are moves left on the board
-
         Args:
             board (list[list[str]]): _description_ The board of the game
             size (tuple[int, int]): _description_ The size of the board
-
         Returns:
             bool: _description_ True if there are moves left, False otherwise
         """
+
         for i in range(size[0]) :
-            if Game.CaseSate.EMPTY in board[i]:
-                return True
+            for j in range(size[1]) :
+                if board[i][j] == Game.CaseSate.EMPTY:
+                    return True
         return False
 
     @staticmethod
     def evaluate(board: list[list[str]], size: tuple[int, int]) -> int:
         """_summary_ Evaluate the board and return the score
-
         Args:
             board (list[list[str]]): _description_ The board of the game
             size (tuple[int, int]): _description_ The size of the board
-
         Returns:
             int: _description_ The score of the board (10 if PLAYER1 wins, -10 if PLAYER2 wins, 0 otherwise)
         """
@@ -90,7 +90,6 @@ class Brain:
     @staticmethod
     def minimax(board: list[list[str]], size: tuple[int, int], depth: int, isMax: bool, alpha: int, beta: int) -> int:
         """_summary_ Minimax algorithm to find the best solution
-
         Args:
             board (list[list[str]]): _description_ The board of the game
             size (tuple[int, int]): _description_ The size of the board
@@ -98,7 +97,6 @@ class Brain:
             isMax (bool): _description_ True if it's the turn of the player 1, False otherwise
             alpha (int): _description_ The alpha value for the alpha-beta pruning
             beta (int): _description_ The beta value for the alpha-beta pruning
-
         Returns:
             int: _description_ The score of the board (10 if PLAYER1 wins, -10 if PLAYER2 wins, best score otherwise)
         """
@@ -148,27 +146,47 @@ class Brain:
 
         __return__ tuple[int, int]: The best solution for the next turn
         """
-        bestVal: int = -1000
-        bestMove: tuple[int, int] = (-1, -1)
-        depth_limit: int = 2
+###########################################################################################
+        # bestVal: int = -1000
+        # bestMove: tuple[int, int] = (-1, -1)
+        # depth_limit: int = 2
 
+        # for i in range(size[0]):
+        #     for j in range(size[1]):
+        #         if board[i][j] == Game.CaseSate.EMPTY:
+        #             board[i][j] = Game.CaseSate.PLAYER1
+        #             moveVal = Brain.minimax(board, size, depth_limit, False, -float('inf'), float('inf'))
+        #             board[i][j] = Game.CaseSate.EMPTY
+
+        #             if moveVal > bestVal:
+        #                 bestMove = (i, j)
+        #                 bestVal = moveVal
+
+        # if (bestMove[0] == -1 and bestMove[1] == -1):
+        #     for i in range(size[0]):
+        #         for j in range(size[1]):
+        #             if board[i][j] == Game.CaseSate.EMPTY:
+        #                 bestMove = (i, j)
+        #                 break
+###########################################################################################
+        board_data = ""
         for i in range(size[0]):
             for j in range(size[1]):
-                if board[i][j] == Game.CaseSate.EMPTY:
-                    board[i][j] = Game.CaseSate.PLAYER1
-                    moveVal = Brain.minimax(board, size, depth_limit, False, -float('inf'), float('inf'))
-                    board[i][j] = Game.CaseSate.EMPTY
+                board_data += str(board[i][j].value)
+            board_data += " "
+        try:
+            result = subprocess.run(
+                ['./minmax', str(size[0]), str(size[1])] + board_data.split(),
+                capture_output=True,
+                timeout=5,
+                text=True
+            )
+        except subprocess.TimeoutExpired:
+            raise Game.End("PLAYER 1 - Brain Timeout", Game.End.EndType.LOSE)
 
-                    if moveVal > bestVal:
-                        bestMove = (i, j)
-                        bestVal = moveVal
-
-        if (bestMove[0] == -1 and bestMove[1] == -1):
-            for i in range(size[0]):
-                for j in range(size[1]):
-                    if board[i][j] == Game.CaseSate.EMPTY:
-                        bestMove = (i, j)
-                        break
+        # Parse the output
+        bestMove = tuple(map(int, result.stdout.split(',')))
+###########################################################################################
         print(f"{bestMove[0]},{bestMove[1]}")
         return bestMove
 

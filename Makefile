@@ -16,25 +16,32 @@ PYTHON	= python3
 
 PIP		= pip3
 
+OPTI		=	-Ofast -march=native -mtune=native -flto \
+				-pipe -fomit-frame-pointer \
+				-fno-stack-protector -fno-ident -fno-asynchronous-unwind-tables
+
 all: $(NAME)
 
 $(NAME):
 	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
+	@gcc -o minmax ./src/ai/minmax.c $(OPTI)
 	@cp ./src/main.py $(NAME)
 	@chmod +x $(NAME)
 
 clean:
 	@$(RM) __pycache__
-	@find -type f -name ".pytest_cache" -delete
-	@find -type f -name ".mypy_cache" -delete
-	@find -type f -name "*.pyc" -delete
-	@find -type f -name "*.pyo" -delete
-	@find -type f -name "*~" -delete
-	@find -type f -name "requirements.txt" -delete
+	@find . -name ".pytest_cache" -delete
+	@find . -name ".mypy_cache" -delete
+	@find . -name "*.pyc" -delete
+	@find . -name "*.pyo" -delete
+	@find . -name "*~" -delete
+	@find . -name "requirements.txt" -delete
+	@(find . -type d -name "__pycache__" -exec rm -rf {} + 2> /dev/null || true)
 	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" CLEAN Gomoku 💨"$(DEFAULT)
 
 fclean: clean
 	@$(RM) $(NAME)
+	@$(RM) minmax
 	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" FCLEAN Gomoku 🧻"$(DEFAULT)
 
 re: fclean all

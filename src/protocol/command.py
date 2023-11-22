@@ -134,15 +134,13 @@ class Command:
                 command = input()
                 if command == "DONE":
                     game.setBoard(board)
-                    if player == Game.CaseSate.PLAYER1:
-                        Command.turn(game, brain, 0, 0)
-                    else:
+                    if player == Game.CaseSate.PLAYER2:
                         Command.begin(game, brain)
                     break
-                command_tab = [item for item in re.split(r'[ \t,]', command) if item != '']
+                command_tab = [item for item in re.split(r'[ \t,=]', command) if item != '']
                 try:
                     player = Game.CaseSate(int(command_tab[2]))
-                    if player == Game.CaseSate.EMPTY or player == game.getTurn():
+                    if player == Game.CaseSate.EMPTY or player != game.getTurn():
                         raise ValueError
                     board[int(command_tab[0])][int(command_tab[1])] = player
                     game.setTurn(player)
