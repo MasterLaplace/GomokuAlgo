@@ -58,17 +58,37 @@ static int evaluate(board_t *board) {
             if (AT(board) == EMPTY)
                 continue;
 
+            if (j + 3 < (int)WIDTH && AT(board) == AT_H(1) && AT(board) == AT_H(2) && AT(board) == AT_H(3))
+                if (AT(board) == OPPONENT)
+                    return -10;
+
+            if (i + 3 < (int)HEIGHT && AT(board) == AT_V(1) && AT(board) == AT_V(2) && AT(board) == AT_V(3))
+                if (AT(board) == OPPONENT)
+                    return -10;
+
+            if (i + 3 < (int)HEIGHT && j + 3 < (int)WIDTH && AT(board) == AT_D(1) && AT(board) == AT_D(2) && AT(board) == AT_D(3))
+                if (AT(board) == OPPONENT)
+                    return -10;
+
+            if (i + 3 < (int)HEIGHT && j - 3 >= 0 && AT(board) == AT_A(1) && AT(board) == AT_A(2) && AT(board) == AT_A(3))
+                if (AT(board) == OPPONENT)
+                    return -10;
+
             if (j + 4 < (int)WIDTH && AT(board) == AT_H(1) && AT(board) == AT_H(2) && AT(board) == AT_H(3) && AT(board) == AT_H(4))
-                return (AT(board) == PLAYER)?10:-10;
+                if (AT(board) == PLAYER)
+                    return 10;
 
             if (i + 4 < (int)HEIGHT && AT(board) == AT_V(1) && AT(board) == AT_V(2) && AT(board) == AT_V(3) && AT(board) == AT_V(4))
-                return (AT(board) == PLAYER)?10:-10;
+                if (AT(board) == PLAYER)
+                    return 10;
 
             if (i + 4 < (int)HEIGHT && j + 4 < (int)WIDTH && AT(board) == AT_D(1) && AT(board) == AT_D(2) && AT(board) == AT_D(3) && AT(board) == AT_D(4))
-                return (AT(board) == PLAYER)?10:-10;
+                if (AT(board) == PLAYER)
+                    return 10;
 
             if (i + 4 < (int)HEIGHT && j - 4 >= 0 && AT(board) == AT_A(1) && AT(board) == AT_A(2) && AT(board) == AT_A(3) && AT(board) == AT_A(4))
-                return (AT(board) == PLAYER)?10:-10;
+                if (AT(board) == PLAYER)
+                    return 10;
         }
     }
     return 0;
@@ -110,7 +130,7 @@ static int minmax(board_t *board, unsigned depth, bool isMax, int albe[])
     return best;
 }
 
-int main(int ac, const char *av[])
+int main(unsigned ac, const char *av[])
 {
     board_t *board = &(board_t) {
         .size = {(unsigned)atoi(av[1]), (unsigned)atoi(av[2])},
