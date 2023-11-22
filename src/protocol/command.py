@@ -137,8 +137,7 @@ class Command:
                     if player == Game.CaseSate.PLAYER2:
                         Command.begin(game, brain)
                     break
-                command_tab = [item for item in re.split(r'[ \t,]', command) if item != '']
-                print(command_tab)
+                command_tab = [item for item in re.split(r'[ \t,=]', command) if item != '']
                 try:
                     player = Game.CaseSate(int(command_tab[2]))
                     if player == Game.CaseSate.EMPTY or player != game.getTurn():

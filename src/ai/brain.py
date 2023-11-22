@@ -175,7 +175,6 @@ class Brain:
                 board_data += str(board[i][j].value)
             board_data += " "
         try:
-            print(['./minmax', str(size[0]), str(size[1])] + board_data.split())
             result = subprocess.run(
                 ['./minmax', str(size[0]), str(size[1])] + board_data.split(),
                 capture_output=True,
