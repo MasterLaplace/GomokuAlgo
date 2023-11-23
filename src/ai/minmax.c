@@ -83,10 +83,9 @@ int evaluate(board_t *board) {
             if (AT(board) == EMPTY)
                 continue;
 
-            // Check for immediate win for us and immediate loss for opponent
-            if ((AT(board) == PLAYER && is_near_win(board, PLAYER)) ||
-                (AT(board) == OPPONENT && is_near_win(board, OPPONENT))) {
-                return AT(board) == PLAYER ? WIN_SCORE : -WIN_SCORE;
+            // Check for immediate win for the player if so return win score
+            if (is_near_win(board, PLAYER)) {
+                return WIN_SCORE;
             }
 
             // Check for four in a row
@@ -112,6 +111,7 @@ int evaluate(board_t *board) {
                 (i + 1 < HEIGHT && j - 1 >= 0 && AT(board) == AT_A(1))) {
                 score += (AT(board) == PLAYER ? TWO_IN_A_ROW_SCORE : -TWO_IN_A_ROW_SCORE);
             }
+
         }
     }
 
