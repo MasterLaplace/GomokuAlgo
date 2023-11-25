@@ -25,7 +25,20 @@ class Command:
             match command_tab[0]:
                 # Mandatory commands
                 case "HELP":
-                    print("HELP")
+                    print("HELP: Display this help")
+                    print("START [size]: Start a new game with a board of size [size]x[size]")
+                    print("TURN [x] [y]: Play on the case [x] [y]")
+                    print("BEGIN: Let the brain play")
+                    print("BOARD: Display the board")
+                    print("INFO [key] [value]: Set the info [key] to [value]")
+                    print("END: End the game")
+                    print("ABOUT: Display information about the brain")
+                    print("RECTSTART [width] [height]: Start a new game with a board of size [width]x[height]")
+                    print("RESTART: Restart the game")
+                    print("TAKEBACK: Takeback the last move")
+                    print("PLAY: Play a move")
+                    print("SWAP2BOARD: Swap the board")
+                    print("DEBUG_BOARD: Display the board in debug mode")
                 case "START": # [size]
                     Command.start(game, brain, int(command_tab[1]))
                 case "TURN": # [x] [y]
@@ -42,11 +55,11 @@ class Command:
                     Command.about(brain)
                 # Optional commands
                 case "RECTSTART":
-                    Command.rectstart(int(command_tab[1]), int(command_tab[2]))
+                    Command.rectstart(game, brain, int(command_tab[1]), int(command_tab[2]))
                 case "RESTART":
                     Command.restart(game, brain)
                 case "TAKEBACK":
-                    Command.takeback(game, brain)
+                    Command.takeback(game)
                 case "PLAY":
                     print("PLAY")
                 case "SWAP2BOARD":
@@ -64,14 +77,11 @@ class Command:
                     print(f"SUGGEST {command_tab[1]},{command_tab[2]}")
                 # Error commands
                 case _:
-                    print("ERROR Unknown command")
-                    print("Please input HELP to get more information")
+                    print("ERROR Unknown command - HELP to get more information")
         except IndexError:
-            print("ERROR Invalid command")
-            print("Please input HELP to get more information")
+            print("ERROR Invalid command - HELP to get more information")
         except ValueError:
-            print("ERROR Invalid command")
-            print("Please input HELP to get more information")
+            print("ERROR Invalid command - HELP to get more information")
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
 
@@ -93,34 +103,34 @@ class Command:
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
             if error.error_type == Game.Error.ErrorType.FORBIDEN:
-                raise Game.End("PLAYER 2", Game.End.EndType.WIN)
+                raise Game.End("PLAYER 1", Game.End.EndType.WIN)
             raise Game.Error(error.message)
-        width, height = game.getSize()
+        width, _ = game.getSize()
         if game.nb_turn > 8:
-            if game.is_end() == Game.CaseSate.PLAYER1:
+            if game.is_end() == Game.CaseSate.PLAYER2:
                 Command.end(game, brain)
                 Command.start(game, brain, width)
-                raise Game.End("PLAYER 1", Game.End.EndType.WIN)
+                raise Game.End("PLAYER 1", Game.End.EndType.LOSE)
 
         try:
-            x, y = brain.findBestSolution(game.getCopyBoard(), game.getSize())
+            y, x = brain.findBestSolution(game.getCopyBoard(), game.getSize())
             game.turn(x, y)
             if game.nb_turn > 8:
-                if game.is_end() == Game.CaseSate.PLAYER2:
+                if game.is_end() == Game.CaseSate.PLAYER1:
                     Command.end(game, brain)
                     Command.start(game, brain, width)
-                    raise Game.End("PLAYER 2", Game.End.EndType.WIN)
+                    raise Game.End("PLAYER 1", Game.End.EndType.WIN)
             return x, y
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
             if error.error_type == Game.Error.ErrorType.FORBIDEN:
-                raise Game.End("PLAYER 1", Game.End.EndType.WIN)
+                raise Game.End("PLAYER 1", Game.End.EndType.LOSE)
             raise Game.Error(error.message)
 
     @staticmethod
     def begin(game: Game, brain: Brain):
         try:
-            x, y = brain.findBestSolution(game.getCopyBoard(), game.getSize())
+            y, x = brain.findBestSolution(game.getCopyBoard(), game.getSize())
             game.begin(x, y)
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
@@ -129,7 +139,7 @@ class Command:
     def board(game: Game, brain: Brain):
         try:
             board = game.getCopyBoard()
-            player = Game.CaseSate(0)
+            player = Game.CaseSate.EMPTY
             while True:
                 command = input()
                 if command == "DONE":
@@ -142,7 +152,7 @@ class Command:
                     player = Game.CaseSate(int(command_tab[2]))
                     if player == Game.CaseSate.EMPTY or player != game.getTurn():
                         raise ValueError
-                    board[int(command_tab[0])][int(command_tab[1])] = player
+                    board[int(command_tab[1])][int(command_tab[0])] = player
                     game.setTurn(player)
                 except IndexError:
                     print("ERROR Invalid command")
@@ -184,5 +194,5 @@ class Command:
         brain.restart()
 
     @staticmethod
-    def takeback(game: Game, brain: Brain):
+    def takeback(game: Game):
         game.undo()
