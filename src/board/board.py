@@ -145,8 +145,7 @@ class BoardGame:
                 self.current_player = (self.current_player + 1) % 2  # Switch players
                 self.move += 1
             except Game.End as e:
-                print("END")
-                print(e.message)
+                print(f"MESSAGE {e.message}")
                 self.game_started = False
                 self.move = 0
                 self.move_history = []

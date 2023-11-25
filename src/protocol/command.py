@@ -9,6 +9,7 @@ from src.game.game import Game
 from src.ai.brain import Brain
 
 import re
+from random import randint
 
 class Command:
     """_summary_ Parse the command from the protocol and call the corresponding function
@@ -44,7 +45,7 @@ class Command:
                 case "TURN": # [x] [y]
                     Command.turn(game, brain, int(command_tab[1]), int(command_tab[2]))
                 case "BEGIN":
-                    Command.begin(game, brain)
+                    Command.begin(game)
                 case "BOARD":
                     Command.board(game, brain)
                 case "INFO": # [key] [value]
@@ -64,20 +65,9 @@ class Command:
                     print("PLAY")
                 case "SWAP2BOARD":
                     print("SWAP2BOARD")
-                # Commands that are sent by the brain
-                case "UNKNOWN":
-                    print("UNKNOWN")
-                case "ERROR":
-                    print("ERROR")
-                case "MESSAGE":
-                    print("MESSAGE")
-                case "DEBUG":
-                    print("DEBUG")
-                case "SUGGEST": # [x] [y]
-                    print(f"SUGGEST {command_tab[1]},{command_tab[2]}")
                 # Error commands
                 case _:
-                    print("ERROR Unknown command - HELP to get more information")
+                    print("UNKNOWN - HELP to get more information")
         except IndexError:
             print("ERROR Invalid command - HELP to get more information")
         except ValueError:
@@ -128,10 +118,13 @@ class Command:
             raise Game.Error(error.message)
 
     @staticmethod
-    def begin(game: Game, brain: Brain):
+    def begin(game: Game):
         try:
-            y, x = brain.findBestSolution(game.getCopyBoard(), game.getSize())
+            width, height = game.getSize()
+            x = randint(0, width - 1)
+            y = randint(0, height - 1)
             game.begin(x, y)
+            print(f"{x},{y}")
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
 
