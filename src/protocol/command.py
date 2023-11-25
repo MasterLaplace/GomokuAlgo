@@ -159,7 +159,7 @@ class Command:
     @staticmethod
     def info(key: str, value: str):
         if (key == "timeout_turn"):
-            Game.timeout_turn = int(value)
+            Game.timeout_turn = int(value) / 1000
         elif (key == "timeout_match"):
             Game.timeout_match = int(value)
         elif (key == "max_memory"):

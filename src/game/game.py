@@ -10,6 +10,14 @@ from enum import Enum
 class Game:
     """_summary_ The game
     """
+    timeout_turn = 5
+    timeout_match = 1000
+    max_memory = 1000000000
+    time_left = 1000
+    game_type = 0
+    rule = 0
+    evaluate = 0
+    folder = ""
 
     class CaseSate(Enum):
         """_summary_ Enum for case state

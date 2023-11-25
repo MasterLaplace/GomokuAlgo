@@ -178,7 +178,7 @@ class Brain:
             result = subprocess.run(
                 ['./minmax', str(size[1]), str(size[0])] + board_data.split(),
                 capture_output=True,
-                timeout=5,
+                timeout=Game.timeout_turn,
                 text=True
             )
         except subprocess.TimeoutExpired:
