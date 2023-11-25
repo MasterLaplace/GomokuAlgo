@@ -138,7 +138,7 @@ class Command:
                 if command == "DONE":
                     game.setBoard(board)
                     if player == Game.CaseSate.PLAYER2:
-                        Command.begin(game, brain)
+                        Command.begin(game)
                     break
                 command_tab = [item for item in re.split(r'[ \t,=]', command) if item != '']
                 try:
