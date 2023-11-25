@@ -93,28 +93,28 @@ class Command:
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
             if error.error_type == Game.Error.ErrorType.FORBIDEN:
-                raise Game.End("PLAYER 1", Game.End.EndType.WIN)
+                raise Game.End("PLAYER 1", Game.End.EndType.LOSE)
             raise Game.Error(error.message)
         width, _ = game.getSize()
         if game.nb_turn > 8:
-            if game.is_end() == Game.CaseSate.PLAYER2:
+            if game.is_end(Game.CaseSate.PLAYER1):
                 Command.end(game, brain)
                 Command.start(game, brain, width)
-                raise Game.End("PLAYER 1", Game.End.EndType.LOSE)
+                raise Game.End("PLAYER 1", Game.End.EndType.WIN)
 
         try:
             y, x = brain.findBestSolution(game.getCopyBoard(), game.getSize())
             game.turn(x, y)
             if game.nb_turn > 8:
-                if game.is_end() == Game.CaseSate.PLAYER1:
+                if game.is_end(Game.CaseSate.PLAYER2):
                     Command.end(game, brain)
                     Command.start(game, brain, width)
-                    raise Game.End("PLAYER 1", Game.End.EndType.WIN)
+                    raise Game.End("PLAYER 1", Game.End.EndType.LOSE)
             return x, y
         except Game.Error as error:
             print(f"ERROR message - {error.message}")
             if error.error_type == Game.Error.ErrorType.FORBIDEN:
-                raise Game.End("PLAYER 1", Game.End.EndType.LOSE)
+                raise Game.End("PLAYER 1", Game.End.EndType.WIN)
             raise Game.Error(error.message)
 
     @staticmethod
