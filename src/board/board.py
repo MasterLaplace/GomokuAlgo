@@ -105,10 +105,6 @@ class BoardGame:
             self.draw_text_centered(error_msg, self.small_font, (255, 0, 0), pygame.Rect(0, 350, self.total_width, 50))
 
     def run_game(self):
-        self.game_width = self.board_size * self.cell_size
-        self.total_width = self.game_width + self.log_width  # Update total width
-        self.game_height = self.game_width + self.cell_size  # Making the height equal to the game width for a square board
-        self.screen = pygame.display.set_mode((self.total_width, self.game_height))
         self.log_scroll_pos = max(0, len(self.move_history) - self.visible_count)  # Update scroll position on new game
         while self.game_started:
             for event in pygame.event.get():
@@ -149,8 +145,7 @@ class BoardGame:
                 self.current_player = (self.current_player + 1) % 2  # Switch players
                 self.move += 1
             except Game.End as e:
-                print("END")
-                print(e.message)
+                print(f"MESSAGE {e.message}")
                 self.game_started = False
                 self.move = 0
                 self.move_history = []
@@ -257,13 +252,13 @@ class BoardGame:
         index_offset_x = self.cell_size
         index_offset_y = self.cell_size
 
-        # Draw row indices along the left edge
+        # Draw column indices along the top edge
         for y in range(self.board_size):
             text_surface = self.small_font.render(str(y), True, self.font_color)
             text_rect = text_surface.get_rect(left=5, centery=(y * self.cell_size + index_offset_y + self.cell_size // 2))
             self.screen.blit(text_surface, text_rect)
 
-        # Draw column indices along the top edge
+        # Draw row indices along the left edge
         for x in range(self.board_size):
             text_surface = self.small_font.render(str(x), True, self.font_color)
             text_rect = text_surface.get_rect(centerx=(x * self.cell_size + index_offset_x + self.cell_size // 2), top=5)

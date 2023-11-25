@@ -54,7 +54,7 @@ class Game:
         self.nb_turn: int = 0
         self.logs: list[tuple(int, Game.CaseSate, int, int)] = []
 
-    def getCopyBoard(self) -> list[list[int]]:
+    def getCopyBoard(self) -> list[list[CaseSate]]:
         if not self.__started:
             raise Game.Error("Game is not started")
         return self.__board.copy()
@@ -72,7 +72,7 @@ class Game:
     def getInfo(self, key: str, value: str):
         pass
 
-    def setBoard(self, board: list[list[int]]):
+    def setBoard(self, board: list[list[CaseSate]]):
         if not self.__started:
             raise Game.Error("Game is not started")
         self.__board = board
@@ -108,8 +108,8 @@ class Game:
     def turn(self, x: int, y: int):
         if not self.__started:
             raise Game.Error("Game is not started")
-        if self.__board[x][y] == Game.CaseSate.EMPTY:
-            self.__board[x][y] = self.__turn
+        if self.__board[y][x] == Game.CaseSate.EMPTY:
+            self.__board[y][x] = self.__turn
             self.logs.append((self.nb_turn, self.__turn, x, y))
             self.nb_turn += 1
             self.__turn = Game.CaseSate.PLAYER1 if self.__turn == Game.CaseSate.PLAYER2 else Game.CaseSate.PLAYER2
@@ -118,7 +118,7 @@ class Game:
 
     def begin(self, x: int, y: int):
         if self.nb_turn == 0:
-            self.__board[x][y] = Game.CaseSate.PLAYER2
+            self.__board[y][x] = Game.CaseSate.PLAYER2
             self.logs.append((self.nb_turn, Game.CaseSate.PLAYER2, x, y))
             self.nb_turn = 1
             self.__turn = Game.CaseSate.PLAYER1
@@ -136,25 +136,25 @@ class Game:
         PLAYER2: The game is ended and the player 2 won
         """
         empty_case = 0
-        for i in range(0, self.__size[0]):
-            for j in range(0, self.__size[1]):
+        for i in range(0, self.__size[1]):
+            for j in range(0, self.__size[0]):
                 if self.__board[i][j] == Game.CaseSate.EMPTY:
                     empty_case += 1
                     continue
                 # check horizontal
-                if j + 4 < self.__size[1]:
+                if j + 4 < self.__size[0]:
                     if self.__board[i][j] == self.__board[i][j + 1] == self.__board[i][j + 2] == self.__board[i][j + 3] == self.__board[i][j + 4]:
                         return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
                 # check vertical
-                if i + 4 < self.__size[0]:
+                if i + 4 < self.__size[1]:
                     if self.__board[i][j] == self.__board[i + 1][j] == self.__board[i + 2][j] == self.__board[i + 3][j] == self.__board[i + 4][j]:
                         return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
                 # check diagonal
-                if i + 4 < self.__size[0] and j + 4 < self.__size[1]:
+                if i + 4 < self.__size[1] and j + 4 < self.__size[0]:
                     if self.__board[i][j] == self.__board[i + 1][j + 1] == self.__board[i + 2][j + 2] == self.__board[i + 3][j + 3] == self.__board[i + 4][j + 4]:
                         return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
                 # check anti-diagonal
-                if i + 4 < self.__size[0] and j - 4 >= 0:
+                if i + 4 < self.__size[1] and j - 4 >= 0:
                     if self.__board[i][j] == self.__board[i + 1][j - 1] == self.__board[i + 2][j - 2] == self.__board[i + 3][j - 3] == self.__board[i + 4][j - 4]:
                         return Game.CaseSate.PLAYER1 if self.__board[i][j] == Game.CaseSate.PLAYER1 else Game.CaseSate.PLAYER2
         if empty_case == 0:
@@ -166,7 +166,7 @@ class Game:
             raise Game.Error("Game has not started")
         self.nb_turn -= 1
         self.__turn = Game.CaseSate.PLAYER1 if self.__turn == Game.CaseSate.PLAYER2 else Game.CaseSate.PLAYER2
-        self.__board[self.logs[self.nb_turn][2]][self.logs[self.nb_turn][3]] = Game.CaseSate.EMPTY
+        self.__board[self.logs[self.nb_turn][3]][self.logs[self.nb_turn][2]] = Game.CaseSate.EMPTY
         self.logs.pop()
 
     def end(self):

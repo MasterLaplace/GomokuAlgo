@@ -20,18 +20,17 @@ if __name__ == "__main__":
             from src.board.board import BoardGame
             BoardGame(game, brain)
         except KeyboardInterrupt:
-            print("\nUnplugging the brain")
+            print("\nMESSAGE Unplugging the brain")
     else:
         while True:
             try:
                 Command.manage_command(game, brain, input())
             except Game.End as e:
-                print("END")
-                print(e.message)
+                print(f"MESSAGE {e.message}")
                 game.end()
                 brain.end()
             except KeyboardInterrupt:
-                print("\nUnplugging the brain")
+                print("\nMESSAGE Unplugging the brain")
                 quit()
             except EOFError:
                 quit()
