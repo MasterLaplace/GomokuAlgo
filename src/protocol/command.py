@@ -155,8 +155,23 @@ class Command:
 
     @staticmethod
     def info(key: str, value: str):
-        pass
-
+        if (key == "timeout_turn"):
+            Game.timeout_turn = int(value)
+        elif (key == "timeout_match"):
+            Game.timeout_match = int(value)
+        elif (key == "max_memory"):
+            Game.max_memory = int(value)
+        elif (key == "time_left"):
+            Game.time_left = int(value)
+        elif (key == "game_type"):
+            Game.game_type = int(value)
+        elif (key == "rule"):
+            Game.rule = int(value)
+        elif (key == "evaluate"):
+            Game.evaluate = int(value)
+        elif (key == "folder"):
+            Game.folder = value
+            
     @staticmethod
     def end(game: Game, brain: Brain):
         game.end()
