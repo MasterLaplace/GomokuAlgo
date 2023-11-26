@@ -176,7 +176,7 @@ class Brain:
             board_data += " "
         try:
             result = subprocess.run(
-                ['./minmax', str(size[1]), str(size[0])] + board_data.split(),
+                ['./let_ai', str(size[1]), str(size[0])] + board_data.split(),
                 capture_output=True,
                 timeout=Game.timeout_turn,
                 text=True

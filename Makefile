@@ -24,7 +24,7 @@ all: $(NAME)
 
 $(NAME):
 	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
-	@gcc -o minmax ./src/ai/minmax.c $(OPTI)
+	@gcc -o let_ai ./src/ai/let_ai.c $(OPTI)
 	@cp ./src/main.py $(NAME)
 	@chmod +x $(NAME)
 
@@ -41,7 +41,7 @@ clean:
 
 fclean: clean
 	@$(RM) $(NAME)
-	@$(RM) minmax
+	@$(RM) let_ai
 	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" FCLEAN Gomoku 🧻"$(DEFAULT)
 
 re: fclean all

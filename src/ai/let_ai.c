@@ -38,17 +38,17 @@ typedef unsigned char uint8_t;
  * @example ./let_ai 5 5 00000 00000 00000 00000 00000
  *
  * @details 1. check if ai can win in 1 move
- *          2. check if ai can loose in 1 move
- *          3. check if ai can loose in 2 moves
- *          4. check if ai can win in 2 moves
- *          5. check if ai can win in 3 moves
- *          6. play in the first empty case
+ *          2. check if ai can loose in 1 move (block)
+ *          3. check if ai can loose in 2*2 moves (block)
+ *          4. check if ai can loose in 2 moves (block) by block check
+ *          5. check if ai can win in 2 moves do it
+ *          6. check if ai can win in 3 moves do it
  *
  * @param ac  number of arguments (unused)
  * @param av  arguments {height, width, board}
  * @return int 0 if ok, 1 if error
  */
-int main(unsigned ac, const char *av[])
+int main(int ac, const char *av[])
 {
     int height = atoi(av[1]);
     int width = atoi(av[2]);
