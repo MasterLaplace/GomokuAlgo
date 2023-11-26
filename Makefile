@@ -11,22 +11,32 @@
 export
 
 NAME	= pbrain-gomoku-ai
+WIN_NAME = pbrain-gomoku-ai.exe
 
 PYTHON	= python3
-
 PIP		= pip3
+
+CC_LINUX = gcc
+CC_WIN   = x86_64-w64-mingw32-gcc
 
 OPTI		=	-Ofast -march=native -mtune=native -flto \
 				-pipe -fomit-frame-pointer \
 				-fno-stack-protector -fno-ident -fno-asynchronous-unwind-tables
 
-all: $(NAME)
+all: linux
 
-$(NAME):
-	@$(ECHO) $(BOLD) $(GREEN)"\n► Gomoku 📦 !\n"$(DEFAULT)
-	@gcc -o let_ai ./src/ai/let_ai.c $(OPTI)
+linux:
+	@echo "Building for Linux..."
+	@$(CC_LINUX) -o let_ai ./src/ai/let_ai.c $(OPTI)
 	@cp ./src/main.py $(NAME)
 	@chmod +x $(NAME)
+
+windows:
+	@$(PIP) install pyinstaller
+	@sudo dnf install mingw64-gcc
+	@echo "Building for Windows..."
+	@$(CC_WIN) -o let_ai.exe ./src/ai/let_ai.c $(OPTI)
+	@$(PYTHON) -m PyInstaller --onefile ./src/main.py --name $(WIN_NAME)
 
 clean:
 	@$(RM) __pycache__
@@ -37,12 +47,12 @@ clean:
 	@find . -name "*~" -delete
 	@find . -name "requirements.txt" -delete
 	@(find . -type d -name "__pycache__" -exec rm -rf {} + 2> /dev/null || true)
-	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" CLEAN Gomoku 💨"$(DEFAULT)
+	@rm -rf build dist $(WIN_NAME).spec $(WIN_NAME)
 
 fclean: clean
 	@$(RM) $(NAME)
 	@$(RM) let_ai
-	@-$(ECHO) $(BOLD) $(GREEN)✓$(LIGHT_BLUE)" FCLEAN Gomoku 🧻"$(DEFAULT)
+	@rm -f $(NAME) let_ai let_ai.exe
 
 re: fclean all
 
