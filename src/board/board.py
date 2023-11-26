@@ -14,8 +14,10 @@ from src.protocol.command import Command
 from src.game.game import Game
 from src.ai.brain import Brain
 
+from time import sleep
+
 class BoardGame:
-    def __init__(self, game: Game, brain: Brain):
+    def __init__(self, game: Game, brain: Brain, auto_train: bool = False):
         pygame.init()
 
         self.cell_size = 40  # Size for each cell on the board
@@ -45,6 +47,7 @@ class BoardGame:
         self.move_history = []  # To store move history for the log
         self.log_scroll_pos = 0  # Initial log scroll position
         self.move = 0
+        self.auto_train = auto_train
 
         self.frame_count = 0
         self.frame_rate = 60
@@ -113,6 +116,60 @@ class BoardGame:
                     pygame.quit()
                     quit()
                 self.handle_game_event(event)
+            if self.auto_train:
+                sleep(0.5)
+                try:
+                    x, y = Command.auto_train(self.__game, self.__brain)
+                    self.game_matrix[y][x] = self.current_player
+                    # Log the move with a shifted position because the visual offset doesn't change matrix coordinates
+                    self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
+                    self.current_player = (self.current_player + 1) % 2  # Switch players
+                    self.move += 1
+                except Game.End as e:
+                    print(f"MESSAGE {e.message}")
+                    sleep(5)
+                    rect = pygame.Rect(0, 0, self.game_width + self.cell_size, self.game_height)
+                    sub = self.screen.subsurface(rect)
+                    pygame.image.save(sub, "screenshot.jpg")
+                    self.game_started = False
+                    self.move = 0
+                    self.move_history = []
+                    self.current_player = 0
+                    self.game_matrix = []
+                    self.__game.end()
+                    self.__brain.end()
+                    self.log_width = 400  # Width for the log space
+                    self.game_width, self.game_height = 800, 600  # Initial game window size
+                    self.total_width = self.game_width + self.log_width  # Total window width including log
+                    self.screen = pygame.display.set_mode((self.total_width, self.game_height))
+                    pygame.display.set_caption("GOMOKU Setup")
+                    self.run()
+                try:
+                    x, y = Command.auto_train(self.__game, self.__brain)
+                    self.game_matrix[y][x] = self.current_player
+                    # Log the move with a shifted position because the visual offset doesn't change matrix coordinates
+                    self.move_history.append(f"- {self.move} : p{self.current_player + 1}: ({x}, {y})")
+                    self.current_player = (self.current_player + 1) % 2  # Switch players
+                    self.move += 1
+                except Game.End as e:
+                    print(f"MESSAGE {e.message}")
+                    sleep(5)
+                    rect = pygame.Rect(0, 0, self.game_width + self.cell_size, self.game_height)
+                    sub = self.screen.subsurface(rect)
+                    pygame.image.save(sub, "screenshot.jpg")
+                    self.game_started = False
+                    self.move = 0
+                    self.move_history = []
+                    self.current_player = 0
+                    self.game_matrix = []
+                    self.__game.end()
+                    self.__brain.end()
+                    self.log_width = 400  # Width for the log space
+                    self.game_width, self.game_height = 800, 600  # Initial game window size
+                    self.total_width = self.game_width + self.log_width  # Total window width including log
+                    self.screen = pygame.display.set_mode((self.total_width, self.game_height))
+                    pygame.display.set_caption("GOMOKU Setup")
+                    self.run()
             self.draw_board_screen()
 
     def handle_game_event(self, event):
