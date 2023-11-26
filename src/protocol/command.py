@@ -149,7 +149,7 @@ class Command:
     def board(game: Game, brain: Brain):
         try:
             board = game.getCopyBoard()
-            player = Game.CaseSate.EMPTY
+            player = Game.CaseSate.PLAYER2
             while True:
                 command = input()
                 if command == "DONE":

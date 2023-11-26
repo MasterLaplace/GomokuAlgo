@@ -89,86 +89,86 @@ int main(int ac, const char *av[])
             me = AT(board);
 
             //* horizontal check *//
-            // if 1 1 1 1 0
+            // if 2 2 2 2 0
             if (j + 4 < width && me == OPPONENT && me == AT_H(1) && me == AT_H(2) && me == AT_H(3) && EMPTY == AT_H(4))
                 return !printf("%d,%d\n", i, j + 4);
 
-            // or 1 1 0 1 1
+            // or 2 2 0 2 2
             if (j + 4 < width && me == OPPONENT && me == AT_H(1) && EMPTY == AT_H(2) && me == AT_H(3) && me == AT_H(4))
                 return !printf("%d,%d\n", i, j + 2);
 
-            // or 1 0 1 1 1
+            // or 2 0 2 2 2
             if (j + 4 < width && me == OPPONENT && EMPTY == AT_H(1) && me == AT_H(2) && me == AT_H(3) && me == AT_H(4))
                 return !printf("%d,%d\n", i, j + 1);
 
-            // or 1 1 1 0 1
+            // or 2 2 2 0 2
             if (j + 4 < width && me == OPPONENT && me == AT_H(1) && me == AT_H(2) && EMPTY == AT_H(3) && me == AT_H(4))
                 return !printf("%d,%d\n", i, j + 3);
 
-            // or 0 1 1 1 1
+            // or 0 2 2 2 2
             if (j + 4 < width && EMPTY == me && OPPONENT == AT_H(1) && OPPONENT == AT_H(2) && OPPONENT == AT_H(3) && OPPONENT == AT_H(4))
                 return !printf("%d,%d\n", i, j);
 
             //* vertical check *//
-            // if 1 1 1 1 0
+            // if 2 2 2 2 0
             if (i + 4 < height && me == OPPONENT && me == AT_V(1) && me == AT_V(2) && me == AT_V(3) && EMPTY == AT_V(4))
                 return !printf("%d,%d\n", i + 4, j);
 
-            // or 1 1 0 1 1
+            // or 2 2 0 2 2
             if (i + 4 < height && me == OPPONENT && me == AT_V(1) && EMPTY == AT_V(2) && me == AT_V(3) && me == AT_V(4))
                 return !printf("%d,%d\n", i + 2, j);
 
-            // or 1 0 1 1 1
+            // or 2 0 2 2 2
             if (i + 4 < height && me == OPPONENT && EMPTY == AT_V(1) && me == AT_V(2) && me == AT_V(3) && me == AT_V(4))
                 return !printf("%d,%d\n", i + 1, j);
 
-            // or 1 1 1 0 1
+            // or 2 2 2 0 2
             if (i + 4 < height && me == OPPONENT && me == AT_V(1) && me == AT_V(2) && EMPTY == AT_V(3) && me == AT_V(4))
                 return !printf("%d,%d\n", i + 3, j);
 
-            // or 0 1 1 1 1
+            // or 0 2 2 2 2
             if (i + 4 < height && EMPTY == me && OPPONENT == AT_V(1) && OPPONENT == AT_V(2) && OPPONENT == AT_V(3) && OPPONENT == AT_V(4))
                 return !printf("%d,%d\n", i, j);
 
             //* diagonal check *//
-            // if 1 1 1 1 0
+            // if 2 2 2 2 0
             if (i + 4 < height && j + 4 < width && me == OPPONENT && me == AT_D(1) && me == AT_D(2) && me == AT_D(3) && EMPTY == AT_D(4))
                 return !printf("%d,%d\n", i + 4, j + 4);
 
-            // or 1 1 0 1 1
+            // or 2 2 0 2 2
             if (i + 4 < height && j + 4 < width && me == OPPONENT && me == AT_D(1) && EMPTY == AT_D(2) && me == AT_D(3) && me == AT_D(4))
                 return !printf("%d,%d\n", i + 2, j + 2);
 
-            // or 1 0 1 1 1
+            // or 2 0 2 2 2
             if (i + 4 < height && j + 4 < width && me == OPPONENT && EMPTY == AT_D(1) && me == AT_D(2) && me == AT_D(3) && me == AT_D(4))
                 return !printf("%d,%d\n", i + 1, j + 1);
 
-            // or 1 1 1 0 1
+            // or 2 2 2 0 2
             if (i + 4 < height && j + 4 < width && me == OPPONENT && me == AT_D(1) && me == AT_D(2) && EMPTY == AT_D(3) && me == AT_D(4))
                 return !printf("%d,%d\n", i + 3, j + 3);
 
-            // or 0 1 1 1 1
+            // or 0 2 2 2 2
             if (i + 4 < height && j + 4 < width && EMPTY == me && OPPONENT == AT_D(1) && OPPONENT == AT_D(2) && OPPONENT == AT_D(3) && OPPONENT == AT_D(4))
                 return !printf("%d,%d\n", i, j);
 
             //* anti-diagonal check *//
-            // if 1 1 1 1 0
+            // if 2 2 2 2 0
             if (i + 4 < height && j - 4 >= 0 && me == OPPONENT && me == AT_A(1) && me == AT_A(2) && me == AT_A(3) && EMPTY == AT_A(4))
                 return !printf("%d,%d\n", i + 4, j - 4);
 
-            // or 1 1 0 1 1
+            // or 2 2 0 2 2
             if (i + 4 < height && j - 4 >= 0 && me == OPPONENT && me == AT_A(1) && EMPTY == AT_A(2) && me == AT_A(3) && me == AT_A(4))
                 return !printf("%d,%d\n", i + 2, j - 2);
 
-            // or 1 0 1 1 1
+            // or 2 0 2 2 2
             if (i + 4 < height && j - 4 >= 0 && me == OPPONENT && EMPTY == AT_A(1) && me == AT_A(2) && me == AT_A(3) && me == AT_A(4))
                 return !printf("%d,%d\n", i + 1, j - 1);
 
-            // or 1 1 1 0 1
+            // or 2 2 2 0 2
             if (i + 4 < height && j - 4 >= 0 && me == OPPONENT && me == AT_A(1) && me == AT_A(2) && EMPTY == AT_A(3) && me == AT_A(4))
                 return !printf("%d,%d\n", i + 3, j - 3);
 
-            // or 0 1 1 1 1
+            // or 0 2 2 2 2
             if (i + 4 < height && j - 4 >= 0 && EMPTY == me && OPPONENT == AT_A(1) && OPPONENT == AT_A(2) && OPPONENT == AT_A(3) && OPPONENT == AT_A(4))
                 return !printf("%d,%d\n", i, j);
 
