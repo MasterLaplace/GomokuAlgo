@@ -250,4 +250,7 @@ fabric.properties
 # Project Specific
 # ----------------
 .Test/
-gomoku
+pbrain-gomoku-ai
+let_ai
+minmax_ai
+*.jpg

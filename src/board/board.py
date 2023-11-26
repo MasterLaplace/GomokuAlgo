@@ -117,7 +117,6 @@ class BoardGame:
                     quit()
                 self.handle_game_event(event)
             if self.auto_train:
-                sleep(0.5)
                 try:
                     x, y = Command.auto_train(self.__game, self.__brain)
                     self.game_matrix[y][x] = self.current_player

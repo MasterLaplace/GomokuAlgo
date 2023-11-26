@@ -79,7 +79,7 @@ class Command:
     def auto_train(game: Game, brain: Brain)-> tuple[int, int]:
         try:
             tmp: Game.CaseSate = game.getTurn()
-            y, x = brain.findBestSolution(game.getCopyBoard(), game.getSize())
+            y, x = brain.findBestSolution(game.getCopyBoard(), game.getSize(), game.getTurn())
             game.turn(x, y)
             if game.nb_turn > 8:
                 if game.is_end(tmp):

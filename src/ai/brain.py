@@ -136,7 +136,7 @@ class Brain:
 
             return best
 
-    def findBestSolution(self, board: list[list[Game.CaseSate]], size: tuple[int, int]) -> tuple[int, int]:
+    def findBestSolution(self, board: list[list[Game.CaseSate]], size: tuple[int, int], turn: Game.CaseSate=Game.CaseSate.PLAYER1) -> tuple[int, int]:
         """_summary_ Find the best solution for the next turn
 
         __description__ Find the best solution for the next turn by using the LET algorithm

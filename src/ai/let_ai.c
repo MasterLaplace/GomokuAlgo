@@ -33,7 +33,7 @@ typedef unsigned char uint8_t;
  *
  * @note   the best move is printed on stdout "x,y\n".
  * @note   complete log is written in let.log.
- * @note   complexity: O(n*6) with n = height * width
+ * @note   complexity: O(n*rules) with n = height * width and rules = 4 * 8 * 2 = 64
  *
  * @example ./let_ai 5 5 00000 00000 00000 00000 00000
  *
@@ -307,39 +307,37 @@ int main(int ac, const char *av[])
             // board[(i - 2) * width + j + (-2|0|2)]
             // board[(i + 2) * width + j + (-2|0|2)]
             #define DIAGONAL_LEFT_UP board[(tmp_y - 2) * width + tmp_x - 2] + board[(tmp_y - 1) * width + tmp_x - 1] % 48
-            #define HORIZONTAL_LEFT board[tmp_y * width + tmp_x - 2] + board[tmp_y * width + tmp_x - 1] % 48
-            #define DIAGONAL_LEFT_DOWN board[(tmp_y + 2) * width + tmp_x - 2] + board[(tmp_y + 1) * width + tmp_x - 1] % 48
             #define VERTICAL_UP board[(tmp_y - 2) * width + tmp_x] + board[(tmp_y - 1) * width + tmp_x] % 48
-            #define VERTICAL_DOWN board[(tmp_y + 2) * width + tmp_x] + board[(tmp_y + 1) * width + tmp_x] % 48
             #define DIAGONAL_RIGHT_UP board[(tmp_y - 2) * width + tmp_x + 2] + board[(tmp_y - 1) * width + tmp_x + 1] % 48
+            #define HORIZONTAL_LEFT board[tmp_y * width + tmp_x - 2] + board[tmp_y * width + tmp_x - 1] % 48
             #define HORIZONTAL_RIGHT board[tmp_y * width + tmp_x + 2] + board[tmp_y * width + tmp_x + 1] % 48
+            #define DIAGONAL_LEFT_DOWN board[(tmp_y + 2) * width + tmp_x - 2] + board[(tmp_y + 1) * width + tmp_x - 1] % 48
+            #define VERTICAL_DOWN board[(tmp_y + 2) * width + tmp_x] + board[(tmp_y + 1) * width + tmp_x] % 48
             #define DIAGONAL_RIGHT_DOWN board[(tmp_y + 2) * width + tmp_x + 2] + board[(tmp_y + 1) * width + tmp_x + 1] % 48
 
-            #define D_L_U 0
-            #define V_U 1
-            #define D_R_U 2
-            #define H_L 3
-            #define H_R 4
-            #define D_L_D 5
-            #define V_D 6
-            #define D_R_D 7
-
-            uint8_t lines[8] = {
-                DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
-                HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
-                DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
-            };
+            uint8_t lines[8] = {0};
 
             //* horizontal check *//
             // if 0 1 1 1 0
             if (j + 4 < width && EMPTY == me && PLAYER == AT_H(1) && PLAYER == AT_H(2) && PLAYER == AT_H(3) && EMPTY == AT_H(4)) {
+                if (i + 2 < height && i - 2 >= 0 && j - 2 >= 0) {
+                    memcpy(lines, (uint8_t [8]){
+                        DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
+                        HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
+                        DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
+                    }, 8);
+                }
                 tmp_x += 4;
 
-                uint8_t lines_h[8]= {
-                    DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
-                    HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
-                    DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
-                };
+                uint8_t lines_h[8]= {0};
+
+                if (tmp_y + 2 < height && tmp_x + 2 < width && tmp_x - 2 >= 0) {
+                    memcpy(lines_h, (uint8_t [8]){
+                        DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
+                        HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
+                        DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
+                    }, 8);
+                }
 
                 // compare without the lines[HORIZONTAL_RIGHT] and lines_h[HORIZONTAL_LEFT]
                 // find max in lines_h
@@ -354,28 +352,27 @@ int main(int ac, const char *av[])
                     if (lines[k] > max2 && k != HORIZONTAL_RIGHT)
                         max2 = lines[k];
 
-
                 if (max > max2)
-                    return !printf("%d,%d\n", i, j);
-                else if (max < max2)
                     return !printf("%d,%d\n", i, j + 4);
+                else if (max < max2)
+                    return !printf("%d,%d\n", i, j);
 
                 // find how many max in lines_h
                 int sum = 0;
                 for (int k = 0; k < 8; ++k)
                     if (lines_h[k] == max && k != HORIZONTAL_LEFT)
-                        sum ++;
+                        sum++;
 
                 // find how many max in lines
                 int sum2 = 0;
                 for (int k = 0; k < 8; ++k)
                     if (lines[k] == max2 && k != HORIZONTAL_RIGHT)
-                        sum2 ++;
+                        sum2++;
 
                 if (sum > sum2)
-                    return !printf("%d,%d\n", i, j);
-                else if (sum < sum2)
                     return !printf("%d,%d\n", i, j + 4);
+                else if (sum < sum2)
+                    return !printf("%d,%d\n", i, j);
 
                 // sum all lines_h
                 sum = 0;
@@ -390,9 +387,9 @@ int main(int ac, const char *av[])
                         sum2 += lines[k];
 
                 if (sum > sum2)
-                    return !printf("%d,%d\n", i, j);
-                else if (sum < sum2)
                     return !printf("%d,%d\n", i, j + 4);
+                else if (sum < sum2)
+                    return !printf("%d,%d\n", i, j);
 
                 return !printf("%d,%d\n", i, j);
             }
@@ -400,13 +397,25 @@ int main(int ac, const char *av[])
             //* vertical check *//
             // if 0 1 1 1 0
             if (i + 4 < height && EMPTY == me && PLAYER == AT_V(1) && PLAYER == AT_V(2) && PLAYER == AT_V(3) && EMPTY == AT_V(4)) {
+                if (j + 2 < width && j - 2 >= 0 && i - 2 >= 0) {
+                    memcpy(lines, (uint8_t [8]){
+                        DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
+                        HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
+                        DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
+                    }, 8);
+                }
+
                 tmp_y += 4;
 
-                uint8_t lines_v[8]= {
-                    DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
-                    HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
-                    DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
-                };
+                uint8_t lines_v[8]= {0};
+
+                if (tmp_x + 2 < width && tmp_x - 2 >= 0 && tmp_y - 2 >= 0) {
+                    memcpy(lines_v, (uint8_t [8]){
+                        DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
+                        HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
+                        DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
+                    }, 8);
+                }
 
                 // compare without the lines[VERTICAL_DOWN] and lines_v[VERTICAL_UP]
                 // find max in lines_v
@@ -422,9 +431,9 @@ int main(int ac, const char *av[])
                         max2 = lines[k];
 
                 if (max > max2)
-                    return !printf("%d,%d\n", i, j);
-                else if (max < max2)
                     return !printf("%d,%d\n", i + 4, j);
+                else if (max < max2)
+                    return !printf("%d,%d\n", i, j);
 
                 // find how many max in lines_v
                 int sum = 0;
@@ -439,9 +448,9 @@ int main(int ac, const char *av[])
                         sum2 ++;
 
                 if (sum > sum2)
-                    return !printf("%d,%d\n", i, j);
-                else if (sum < sum2)
                     return !printf("%d,%d\n", i + 4, j);
+                else if (sum < sum2)
+                    return !printf("%d,%d\n", i, j);
 
                 // sum all lines_v
                 sum = 0;
@@ -456,9 +465,9 @@ int main(int ac, const char *av[])
                         sum2 += lines[k];
 
                 if (sum > sum2)
-                    return !printf("%d,%d\n", i, j);
-                else if (sum < sum2)
                     return !printf("%d,%d\n", i + 4, j);
+                else if (sum < sum2)
+                    return !printf("%d,%d\n", i, j);
 
                 return !printf("%d,%d\n", i, j);
             }
@@ -466,14 +475,26 @@ int main(int ac, const char *av[])
             //* diagonal check *//
             // if 0 1 1 1 0
             if (i + 4 < height && EMPTY == me && j + 4 < width && PLAYER == AT_D(1) && PLAYER == AT_D(2) && PLAYER == AT_D(3) && EMPTY == AT_D(4)) {
+                if (i + 2 < height && j + 2 < width && i - 2 >= 0 && j - 2 >= 0) {
+                    memcpy(lines, (uint8_t [8]){
+                        DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
+                        HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
+                        DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
+                    }, 8);
+                }
+
                 tmp_y += 4;
                 tmp_x += 4;
 
-                uint8_t lines_d[8]= {
-                    DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
-                    HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
-                    DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
-                };
+                uint8_t lines_d[8]= {0};
+
+                if (tmp_y + 2 < height && tmp_x + 2 < width && tmp_y - 2 >= 0 && tmp_x - 2 >= 0) {
+                    memcpy(lines_d, (uint8_t [8]){
+                        DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
+                        HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
+                        DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
+                    }, 8);
+                }
 
                 // compare without the lines[DIAGONAL_RIGHT_DOWN] and lines_d[DIAGONAL_LEFT_UP]
                 // find max in lines_d
@@ -489,9 +510,9 @@ int main(int ac, const char *av[])
                         max2 = lines[k];
 
                 if (max > max2)
-                    return !printf("%d,%d\n", i, j);
-                else if (max < max2)
                     return !printf("%d,%d\n", i + 4, j + 4);
+                else if (max < max2)
+                    return !printf("%d,%d\n", i, j);
 
                 // find how many max in lines_d
                 int sum = 0;
@@ -506,9 +527,9 @@ int main(int ac, const char *av[])
                         sum2 ++;
 
                 if (sum > sum2)
-                    return !printf("%d,%d\n", i, j);
-                else if (sum < sum2)
                     return !printf("%d,%d\n", i + 4, j + 4);
+                else if (sum < sum2)
+                    return !printf("%d,%d\n", i, j);
 
                 // sum all lines_d
                 sum = 0;
@@ -523,9 +544,9 @@ int main(int ac, const char *av[])
                         sum2 += lines[k];
 
                 if (sum > sum2)
-                    return !printf("%d,%d\n", i, j);
-                else if (sum < sum2)
                     return !printf("%d,%d\n", i + 4, j + 4);
+                else if (sum < sum2)
+                    return !printf("%d,%d\n", i, j);
 
                 return !printf("%d,%d\n", i, j);
             }
@@ -533,13 +554,25 @@ int main(int ac, const char *av[])
             //* anti-diagonal check *//
             // if 0 1 1 1 0
             if (i + 4 < height && EMPTY == me && j - 4 >= 0 && PLAYER == AT_A(1) && PLAYER == AT_A(2) && PLAYER == AT_A(3) && EMPTY == AT_A(4)) {
+                if (i + 2 < height && j + 2 < width && i - 2 >= 0 && j - 2 >= 0) {
+                    memcpy(lines, (uint8_t [8]){
+                        DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
+                        HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
+                        DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
+                    }, 8);
+                }
+
                 tmp_y = i + 4;
                 tmp_x = j - 4;
 
-                uint8_t lines_a[8]= {
-                    DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
-                    HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
-                    DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
+                uint8_t lines_a[8]= {0};
+
+                if (tmp_y + 2 < height && tmp_x + 2 < width && tmp_y - 2 >= 0 && tmp_x - 2 >= 0) {
+                    memcpy(lines_a, (uint8_t [8]){
+                        DIAGONAL_LEFT_UP,   VERTICAL_UP,   DIAGONAL_RIGHT_UP,
+                        HORIZONTAL_LEFT,                   HORIZONTAL_RIGHT,
+                        DIAGONAL_LEFT_DOWN, VERTICAL_DOWN, DIAGONAL_RIGHT_DOWN
+                    }, 8);
                 };
 
                 // compare without the lines[DIAGONAL_LEFT_DOWN] and lines_a[DIAGONAL_RIGHT_UP]
@@ -556,9 +589,9 @@ int main(int ac, const char *av[])
                         max2 = lines[k];
 
                 if (max > max2)
-                    return !printf("%d,%d\n", i, j);
-                else if (max < max2)
                     return !printf("%d,%d\n", i + 4, j - 4);
+                else if (max < max2)
+                    return !printf("%d,%d\n", i, j);
 
                 // find how many max in lines_a
                 int sum = 0;
@@ -573,9 +606,9 @@ int main(int ac, const char *av[])
                         sum2 ++;
 
                 if (sum > sum2)
-                    return !printf("%d,%d\n", i, j);
-                else if (sum < sum2)
                     return !printf("%d,%d\n", i + 4, j - 4);
+                else if (sum < sum2)
+                    return !printf("%d,%d\n", i, j);
 
                 // sum all lines_a
                 sum = 0;
@@ -590,9 +623,9 @@ int main(int ac, const char *av[])
                         sum2 += lines[k];
 
                 if (sum > sum2)
-                    return !printf("%d,%d\n", i, j);
-                else if (sum < sum2)
                     return !printf("%d,%d\n", i + 4, j - 4);
+                else if (sum < sum2)
+                    return !printf("%d,%d\n", i, j);
 
                 return !printf("%d,%d\n", i, j);
             }
@@ -607,6 +640,7 @@ int main(int ac, const char *av[])
         }
     } // end of for loops
 #endif
+
 
     // if ai can loose in 2 moves (block) by block check
 #ifdef DEBUG
@@ -662,54 +696,54 @@ int main(int ac, const char *av[])
             me = AT(board);
 
             //* horizontal check *//
-            // if 0 1 1 1 0
+            // if 0 2 2 2 0
             if (j + 4 < width && EMPTY == me && OPPONENT == AT_H(1) && OPPONENT == AT_H(2) && OPPONENT == AT_H(3) && EMPTY == AT_H(4))
                 return !printf("%d,%d\n", i, j);
 
-            // or 0 0 1 1 1
+            // or 0 0 2 2 2
             if (j + 4 < width && EMPTY == me && EMPTY == AT_H(1) && OPPONENT == AT_H(2) && OPPONENT == AT_H(3) && OPPONENT == AT_H(4))
                 return !printf("%d,%d\n", i, j);
 
-            // or 1 1 1 0 0
+            // or 2 2 2 0 0
             if (j + 4 < width && me == OPPONENT && me == AT_H(1) && me == AT_H(2) && EMPTY == AT_H(3) && EMPTY == AT_H(4))
                 return !printf("%d,%d\n", i, j + 3);
 
             //* vertical check *//
-            // if 0 1 1 1 0
+            // if 0 2 2 2 0
             if (i + 4 < height && EMPTY == me && OPPONENT == AT_V(1) && OPPONENT == AT_V(2) && OPPONENT == AT_V(3) && EMPTY == AT_V(4))
                 return !printf("%d,%d\n", i, j);
 
-            // or 0 0 1 1 1
+            // or 0 0 2 2 2
             if (i + 4 < height && EMPTY == me && EMPTY == AT_V(1) && OPPONENT == AT_V(2) && OPPONENT == AT_V(3) && OPPONENT == AT_V(4))
                 return !printf("%d,%d\n", i, j);
 
-            // or 1 1 1 0 0
+            // or 2 2 2 0 0
             if (i + 4 < height && me == OPPONENT && me == AT_V(1) && me == AT_V(2) && EMPTY == AT_V(3) && EMPTY == AT_V(4))
                 return !printf("%d,%d\n", i + 3, j);
 
             //* diagonal check *//
-            // if 0 1 1 1 0
+            // if 0 2 2 2 0
             if (i + 4 < height && j + 4 < width && EMPTY == me && OPPONENT == AT_D(1) && OPPONENT == AT_D(2) && OPPONENT == AT_D(3) && EMPTY == AT_D(4))
                 return !printf("%d,%d\n", i, j);
 
-            // or 0 0 1 1 1
+            // or 0 0 2 2 2
             if (i + 4 < height && j + 4 < width && EMPTY == me && EMPTY == AT_D(1) && OPPONENT == AT_D(2) && OPPONENT == AT_D(3) && OPPONENT == AT_D(4))
                 return !printf("%d,%d\n", i, j);
 
-            // or 1 1 1 0 0
+            // or 2 2 2 0 0
             if (i + 4 < height && j + 4 < width && me == OPPONENT && me == AT_D(1) && me == AT_D(2) && EMPTY == AT_D(3) && EMPTY == AT_D(4))
                 return !printf("%d,%d\n", i + 3, j + 3);
 
             //* anti-diagonal check *//
-            // if 0 1 1 1 0
+            // if 0 2 2 2 0
             if (i + 4 < height && j - 4 >= 0 && EMPTY == me && OPPONENT == AT_A(1) && OPPONENT == AT_A(2) && OPPONENT == AT_A(3) && EMPTY == AT_A(4))
                 return !printf("%d,%d\n", i, j);
 
-            // or 0 0 1 1 1
+            // or 0 0 2 2 2
             if (i + 4 < height && j - 4 >= 0 && EMPTY == me && EMPTY == AT_A(1) && OPPONENT == AT_A(2) && OPPONENT == AT_A(3) && OPPONENT == AT_A(4))
                 return !printf("%d,%d\n", i, j);
 
-            // or 1 1 1 0 0
+            // or 2 2 2 0 0
             if (i + 4 < height && j - 4 >= 0 && me == OPPONENT && me == AT_A(1) && me == AT_A(2) && EMPTY == AT_A(3) && EMPTY == AT_A(4))
                 return !printf("%d,%d\n", i + 3, j - 3);
 
@@ -759,133 +793,133 @@ int main(int ac, const char *av[])
             //* horizontal check *//
 
             // if 0 0 0 1 1
-            if (j + 4 < width && EMPTY == me && EMPTY == AT_H(1) && EMPTY == AT_H(2) && OPPONENT == AT_H(3) && OPPONENT == AT_H(4))
+            if (j + 4 < width && EMPTY == me && PLAYER != AT_H(1) && PLAYER != AT_H(2) && OPPONENT == AT_H(3) && OPPONENT == AT_H(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 0 1 1 0
-            if (j + 4 < width && EMPTY == me && EMPTY == AT_H(1) && OPPONENT == AT_H(2) && OPPONENT == AT_H(3) && EMPTY == AT_H(4))
+            if (j + 4 < width && EMPTY == me && PLAYER != AT_H(1) && OPPONENT == AT_H(2) && OPPONENT == AT_H(3) && PLAYER != AT_H(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 1 1 0 0
-            if (j + 4 < width && EMPTY == me && OPPONENT == AT_H(1) && OPPONENT == AT_H(2) && EMPTY == AT_H(3) && EMPTY == AT_H(4))
+            if (j + 4 < width && EMPTY == me && OPPONENT == AT_H(1) && OPPONENT == AT_H(2) && PLAYER != AT_H(3) && PLAYER != AT_H(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 1 0 0 0
-            if (j + 4 < width && OPPONENT == me && OPPONENT == AT_H(1) && EMPTY == AT_H(2) && EMPTY == AT_H(3) && EMPTY == AT_H(4))
+            if (j + 4 < width && OPPONENT == me && OPPONENT == AT_H(1) && PLAYER != AT_H(2) && PLAYER != AT_H(3) && EMPTY == AT_H(4))
                 return !printf("%d,%d\n", i, j + 4);
             // or 0 1 0 1 0
-            if (j + 4 < width && EMPTY == me && OPPONENT == AT_H(1) && EMPTY == AT_H(2) && OPPONENT == AT_H(3) && EMPTY == AT_H(4))
+            if (j + 4 < width && EMPTY == me && OPPONENT == AT_H(1) && PLAYER != AT_H(2) && OPPONENT == AT_H(3) && PLAYER != AT_H(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 0 1 0 1
-            if (j + 4 < width && EMPTY == me && EMPTY == AT_H(1) && OPPONENT == AT_H(2) && EMPTY == AT_H(3) && OPPONENT == AT_H(4))
+            if (j + 4 < width && EMPTY == me && PLAYER != AT_H(1) && OPPONENT == AT_H(2) && PLAYER != AT_H(3) && OPPONENT == AT_H(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 0 1 0 0
-            if (j + 4 < width && OPPONENT == me && EMPTY == AT_H(1) && OPPONENT == AT_H(2) && EMPTY == AT_H(3) && EMPTY == AT_H(4))
+            if (j + 4 < width && OPPONENT == me && PLAYER != AT_H(1) && OPPONENT == AT_H(2) && PLAYER != AT_H(3) && EMPTY == AT_H(4))
                 return !printf("%d,%d\n", i, j + 4);
             // or 1 0 0 0 1
-            if (j + 4 < width && OPPONENT == me && EMPTY == AT_H(1) && EMPTY == AT_H(2) && EMPTY == AT_H(3) && OPPONENT == AT_H(4))
+            if (j + 4 < width && OPPONENT == me && PLAYER != AT_H(1) && PLAYER != AT_H(2) && EMPTY == AT_H(3) && OPPONENT == AT_H(4))
                 return !printf("%d,%d\n", i, j + 3);
             // or 0 1 0 0 1
-            if (j + 4 < width && EMPTY == me && OPPONENT == AT_H(1) && EMPTY == AT_H(2) && EMPTY == AT_H(3) && OPPONENT == AT_H(4))
+            if (j + 4 < width && EMPTY == me && OPPONENT == AT_H(1) && PLAYER != AT_H(2) && PLAYER != AT_H(3) && OPPONENT == AT_H(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 0 0 1 0
-            if (j + 4 < width && OPPONENT == me && EMPTY == AT_H(1) && EMPTY == AT_H(2) && OPPONENT == AT_H(3) && EMPTY == AT_H(4))
+            if (j + 4 < width && OPPONENT == me && PLAYER != AT_H(1) && PLAYER != AT_H(2) && OPPONENT == AT_H(3) && EMPTY == AT_H(4))
                 return !printf("%d,%d\n", i, j + 4);
 
             //* vertical check *//
 
             // if 0 0 0 1 1
-            if (i + 4 < height && EMPTY == me && EMPTY == AT_V(1) && EMPTY == AT_V(2) && OPPONENT == AT_V(3) && OPPONENT == AT_V(4))
+            if (i + 4 < height && EMPTY == me && PLAYER != AT_V(1) && PLAYER != AT_V(2) && OPPONENT == AT_V(3) && OPPONENT == AT_V(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 0 1 1 0
-            if (i + 4 < height && EMPTY == me && EMPTY == AT_V(1) && OPPONENT == AT_V(2) && OPPONENT == AT_V(3) && EMPTY == AT_V(4))
+            if (i + 4 < height && EMPTY == me && PLAYER != AT_V(1) && OPPONENT == AT_V(2) && OPPONENT == AT_V(3) && PLAYER != AT_V(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 1 1 0 0
-            if (i + 4 < height && EMPTY == me && OPPONENT == AT_V(1) && OPPONENT == AT_V(2) && EMPTY == AT_V(3) && EMPTY == AT_V(4))
+            if (i + 4 < height && EMPTY == me && OPPONENT == AT_V(1) && OPPONENT == AT_V(2) && PLAYER != AT_V(3) && PLAYER != AT_V(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 1 0 0 0
-            if (i + 4 < height && OPPONENT == me && OPPONENT == AT_V(1) && EMPTY == AT_V(2) && EMPTY == AT_V(3) && EMPTY == AT_V(4))
+            if (i + 4 < height && OPPONENT == me && OPPONENT == AT_V(1) && PLAYER != AT_V(2) && PLAYER != AT_V(3) && EMPTY == AT_V(4))
                 return !printf("%d,%d\n", i + 4, j);
             // or 0 1 0 1 0
-            if (i + 4 < height && EMPTY == me && OPPONENT == AT_V(1) && EMPTY == AT_V(2) && OPPONENT == AT_V(3) && EMPTY == AT_V(4))
+            if (i + 4 < height && EMPTY == me && OPPONENT == AT_V(1) && PLAYER != AT_V(2) && OPPONENT == AT_V(3) && PLAYER != AT_V(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 0 1 0 1
-            if (i + 4 < height && EMPTY == me && EMPTY == AT_V(1) && OPPONENT == AT_V(2) && EMPTY == AT_V(3) && OPPONENT == AT_V(4))
+            if (i + 4 < height && EMPTY == me && PLAYER != AT_V(1) && OPPONENT == AT_V(2) && PLAYER != AT_V(3) && OPPONENT == AT_V(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 0 1 0 0
-            if (i + 4 < height && OPPONENT == me && EMPTY == AT_V(1) && OPPONENT == AT_V(2) && EMPTY == AT_V(3) && EMPTY == AT_V(4))
+            if (i + 4 < height && OPPONENT == me && PLAYER != AT_V(1) && OPPONENT == AT_V(2) && PLAYER != AT_V(3) && EMPTY == AT_V(4))
                 return !printf("%d,%d\n", i + 4, j);
             // or 1 0 0 0 1
-            if (i + 4 < height && OPPONENT == me && EMPTY == AT_V(1) && EMPTY == AT_V(2) && EMPTY == AT_V(3) && OPPONENT == AT_V(4))
+            if (i + 4 < height && OPPONENT == me && PLAYER != AT_V(1) && PLAYER != AT_V(2) && EMPTY == AT_V(3) && OPPONENT == AT_V(4))
                 return !printf("%d,%d\n", i + 3, j);
             // or 0 1 0 0 1
-            if (i + 4 < height && EMPTY == me && OPPONENT == AT_V(1) && EMPTY == AT_V(2) && EMPTY == AT_V(3) && OPPONENT == AT_V(4))
+            if (i + 4 < height && EMPTY == me && OPPONENT == AT_V(1) && PLAYER != AT_V(2) && PLAYER != AT_V(3) && OPPONENT == AT_V(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 0 0 1 0
-            if (i + 4 < height && OPPONENT == me && EMPTY == AT_V(1) && EMPTY == AT_V(2) && OPPONENT == AT_V(3) && EMPTY == AT_V(4))
+            if (i + 4 < height && OPPONENT == me && PLAYER != AT_V(1) && PLAYER != AT_V(2) && OPPONENT == AT_V(3) && EMPTY == AT_V(4))
                 return !printf("%d,%d\n", i + 4, j);
 
             //* diagonal check *//
 
             // if 0 0 0 1 1
-            if (i + 4 < height && j + 4 < width && EMPTY == me && EMPTY == AT_D(1) && EMPTY == AT_D(2) && OPPONENT == AT_D(3) && OPPONENT == AT_D(4))
+            if (i + 4 < height && j + 4 < width && EMPTY == me && PLAYER != AT_D(1) && PLAYER != AT_D(2) && OPPONENT == AT_D(3) && OPPONENT == AT_D(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 0 1 1 0
-            if (i + 4 < height && j + 4 < width && EMPTY == me && EMPTY == AT_D(1) && OPPONENT == AT_D(2) && OPPONENT == AT_D(3) && EMPTY == AT_D(4))
+            if (i + 4 < height && j + 4 < width && EMPTY == me && PLAYER != AT_D(1) && OPPONENT == AT_D(2) && OPPONENT == AT_D(3) && PLAYER != AT_D(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 1 1 0 0
-            if (i + 4 < height && j + 4 < width && EMPTY == me && OPPONENT == AT_D(1) && OPPONENT == AT_D(2) && EMPTY == AT_D(3) && EMPTY == AT_D(4))
+            if (i + 4 < height && j + 4 < width && EMPTY == me && OPPONENT == AT_D(1) && OPPONENT == AT_D(2) && PLAYER != AT_D(3) && PLAYER != AT_D(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 1 0 0 0
-            if (i + 4 < height && j + 4 < width && OPPONENT == me && OPPONENT == AT_D(1) && EMPTY == AT_D(2) && EMPTY == AT_D(3) && EMPTY == AT_D(4))
+            if (i + 4 < height && j + 4 < width && OPPONENT == me && OPPONENT == AT_D(1) && PLAYER != AT_D(2) && PLAYER != AT_D(3) && EMPTY == AT_D(4))
                 return !printf("%d,%d\n", i + 4, j + 4);
             // or 0 1 0 1 0
-            if (i + 4 < height && j + 4 < width && EMPTY == me && OPPONENT == AT_D(1) && EMPTY == AT_D(2) && OPPONENT == AT_D(3) && EMPTY == AT_D(4))
+            if (i + 4 < height && j + 4 < width && EMPTY == me && OPPONENT == AT_D(1) && PLAYER != AT_D(2) && OPPONENT == AT_D(3) && PLAYER != AT_D(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 0 1 0 1
-            if (i + 4 < height && j + 4 < width && EMPTY == me && EMPTY == AT_D(1) && OPPONENT == AT_D(2) && EMPTY == AT_D(3) && OPPONENT == AT_D(4))
+            if (i + 4 < height && j + 4 < width && EMPTY == me && PLAYER != AT_D(1) && OPPONENT == AT_D(2) && PLAYER != AT_D(3) && OPPONENT == AT_D(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 0 1 0 0
-            if (i + 4 < height && j + 4 < width && OPPONENT == me && EMPTY == AT_D(1) && OPPONENT == AT_D(2) && EMPTY == AT_D(3) && EMPTY == AT_D(4))
+            if (i + 4 < height && j + 4 < width && OPPONENT == me && PLAYER != AT_D(1) && OPPONENT == AT_D(2) && PLAYER != AT_D(3) && EMPTY == AT_D(4))
                 return !printf("%d,%d\n", i + 4, j + 4);
             // or 1 0 0 0 1
-            if (i + 4 < height && j + 4 < width && OPPONENT == me && EMPTY == AT_D(1) && EMPTY == AT_D(2) && EMPTY == AT_D(3) && OPPONENT == AT_D(4))
+            if (i + 4 < height && j + 4 < width && OPPONENT == me && PLAYER != AT_D(1) && PLAYER != AT_D(2) && EMPTY == AT_D(3) && OPPONENT == AT_D(4))
                 return !printf("%d,%d\n", i + 3, j + 3);
             // or 0 1 0 0 1
-            if (i + 4 < height && j + 4 < width && EMPTY == me && OPPONENT == AT_D(1) && EMPTY == AT_D(2) && EMPTY == AT_D(3) && OPPONENT == AT_D(4))
+            if (i + 4 < height && j + 4 < width && EMPTY == me && OPPONENT == AT_D(1) && PLAYER != AT_D(2) && PLAYER != AT_D(3) && OPPONENT == AT_D(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 0 0 1 0
-            if (i + 4 < height && j + 4 < width && OPPONENT == me && EMPTY == AT_D(1) && EMPTY == AT_D(2) && OPPONENT == AT_D(3) && EMPTY == AT_D(4))
+            if (i + 4 < height && j + 4 < width && OPPONENT == me && PLAYER != AT_D(1) && PLAYER != AT_D(2) && OPPONENT == AT_D(3) && EMPTY == AT_D(4))
                 return !printf("%d,%d\n", i + 4, j + 4);
 
             //* anti-diagonal check *//
 
             // if 0 0 0 1 1
-            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && EMPTY == AT_A(1) && EMPTY == AT_A(2) && OPPONENT == AT_A(3) && OPPONENT == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && PLAYER != AT_A(1) && PLAYER != AT_A(2) && OPPONENT == AT_A(3) && OPPONENT == AT_A(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 0 1 1 0
-            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && EMPTY == AT_A(1) && OPPONENT == AT_A(2) && OPPONENT == AT_A(3) && EMPTY == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && PLAYER != AT_A(1) && OPPONENT == AT_A(2) && OPPONENT == AT_A(3) && PLAYER != AT_A(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 1 1 0 0
-            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && OPPONENT == AT_A(1) && OPPONENT == AT_A(2) && EMPTY == AT_A(3) && EMPTY == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && OPPONENT == AT_A(1) && OPPONENT == AT_A(2) && PLAYER != AT_A(3) && PLAYER != AT_A(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 1 0 0 0
-            if (i + 4 < height && j - 4 >= 0 && OPPONENT == me && OPPONENT == AT_A(1) && EMPTY == AT_A(2) && EMPTY == AT_A(3) && EMPTY == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && OPPONENT == me && OPPONENT == AT_A(1) && PLAYER != AT_A(2) && PLAYER != AT_A(3) && EMPTY == AT_A(4))
                 return !printf("%d,%d\n", i + 4, j - 4);
             // or 0 1 0 1 0
-            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && OPPONENT == AT_A(1) && EMPTY == AT_A(2) && OPPONENT == AT_A(3) && EMPTY == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && OPPONENT == AT_A(1) && PLAYER != AT_A(2) && OPPONENT == AT_A(3) && PLAYER != AT_A(4))
                 return !printf("%d,%d\n", i, j);
             // or 0 0 1 0 1
-            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && EMPTY == AT_A(1) && OPPONENT == AT_A(2) && EMPTY == AT_A(3) && OPPONENT == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && PLAYER != AT_A(1) && OPPONENT == AT_A(2) && PLAYER != AT_A(3) && OPPONENT == AT_A(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 0 1 0 0
-            if (i + 4 < height && j - 4 >= 0 && OPPONENT == me && EMPTY == AT_A(1) && OPPONENT == AT_A(2) && EMPTY == AT_A(3) && EMPTY == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && OPPONENT == me && PLAYER != AT_A(1) && OPPONENT == AT_A(2) && PLAYER != AT_A(3) && EMPTY == AT_A(4))
                 return !printf("%d,%d\n", i + 4, j - 4);
             // or 1 0 0 0 1
-            if (i + 4 < height && j - 4 >= 0 && OPPONENT == me && EMPTY == AT_A(1) && EMPTY == AT_A(2) && EMPTY == AT_A(3) && OPPONENT == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && OPPONENT == me && PLAYER != AT_A(1) && PLAYER != AT_A(2) && EMPTY == AT_A(3) && OPPONENT == AT_A(4))
                 return !printf("%d,%d\n", i + 3, j - 3);
             // or 0 1 0 0 1
-            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && OPPONENT == AT_A(1) && EMPTY == AT_A(2) && EMPTY == AT_A(3) && OPPONENT == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && EMPTY == me && OPPONENT == AT_A(1) && PLAYER != AT_A(2) && PLAYER != AT_A(3) && OPPONENT == AT_A(4))
                 return !printf("%d,%d\n", i, j);
             // or 1 0 0 1 0
-            if (i + 4 < height && j - 4 >= 0 && OPPONENT == me && EMPTY == AT_A(1) && EMPTY == AT_A(2) && OPPONENT == AT_A(3) && EMPTY == AT_A(4))
+            if (i + 4 < height && j - 4 >= 0 && OPPONENT == me && PLAYER != AT_A(1) && PLAYER != AT_A(2) && OPPONENT == AT_A(3) && EMPTY == AT_A(4))
                 return !printf("%d,%d\n", i + 4, j - 4);
 
 #ifdef DEBUG
