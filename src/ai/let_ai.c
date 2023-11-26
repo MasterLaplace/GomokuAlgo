@@ -899,9 +899,9 @@ int main(unsigned ac, const char *av[])
     } // end of for loops
 #endif
 
-    // if ai can win in 4 move do it
+    // if ai can win in 4 moves (block)
 #ifdef DEBUG
-    fprintf(log_file, "[LOG]: 4 (do it)\n[\n");
+    fprintf(log_file, "[LOG]: 4 (block)\n[\n");
 #endif
     for (i = 0; i < height; ++i) {
     #ifdef DEBUG
@@ -909,13 +909,13 @@ int main(unsigned ac, const char *av[])
     #endif
         for (j = 0; j < width; ++j) {
             me = AT(board);
-            if (me == OPPONENT && j + 4 < width && EMPTY == AT_H(1))
+            if (j + 4 < width && me == PLAYER && EMPTY == AT_H(1))
                 return !printf("%d,%d\n", i, j + 1);
-            if (me == OPPONENT && i + 4 < height && EMPTY == AT_V(1))
+            if (me + 4 < height &&  me == PLAYER && EMPTY == AT_V(1))
                 return !printf("%d,%d\n", i + 1, j);
-            if (me == OPPONENT && i + 4 < height && j + 4 < width && EMPTY == AT_D(1))
+            if (i + 4 < height && j + 4 < width && me == PLAYER && EMPTY == AT_D(1))
                 return !printf("%d,%d\n", i + 1, j + 1);
-            if (me == OPPONENT && i + 4 < height && j - 4 >= 0 && EMPTY == AT_A(1))
+            if (i + 4 < height && j - 4 >= 0 && me == PLAYER && EMPTY == AT_A(1))
                 return !printf("%d,%d\n", i + 1, j - 1);
 
 #ifdef DEBUG
