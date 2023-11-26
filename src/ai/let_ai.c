@@ -26,8 +26,6 @@ typedef unsigned char uint8_t;
 #define AT_D(_n) board[(i + _n) * width + j + _n]
 #define AT_A(_n) board[(i + _n) * width + j - _n]
 
-#define DEBUG
-
 /**
  * @brief  main function of the ai.
  *

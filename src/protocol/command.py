@@ -160,10 +160,10 @@ class Command:
                 command_tab = [item for item in re.split(r'[ \t,=]', command) if item != '']
                 try:
                     player = Game.CaseSate(int(command_tab[2]))
-                    if player == Game.CaseSate.EMPTY or player != game.getTurn():
+                    if player == Game.CaseSate.EMPTY:
                         raise ValueError
                     board[int(command_tab[1])][int(command_tab[0])] = player
-                    game.setTurn(Game.CaseSate.PLAYER1 if player == Game.CaseSate.PLAYER2 else Game.CaseSate.PLAYER2)
+                    game.setTurn(player)
                 except IndexError:
                     print("ERROR Invalid command")
                     continue
