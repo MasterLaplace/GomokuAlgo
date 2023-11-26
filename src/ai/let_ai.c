@@ -673,6 +673,32 @@ int main(int ac, const char *av[])
             //  1 1
             if (j + 2 < width && i + 2 < height && EMPTY == me && PLAYER == AT_H(1) && PLAYER == AT_V(1) && PLAYER == AT_D(1))
                 return !printf("%d,%d\n", i, j);
+
+            //* square check *//
+            //  0 0 0
+            //  1 0 1
+            //  0 1 0
+            if (j - 1 >= 0 && j + 1 < width && i + 2 < height && EMPTY == me && PLAYER == AT_A(1) && PLAYER == AT_D(1) && PLAYER == AT_V(2))
+                return !printf("%d,%d\n", i, j);
+
+            //  0 1 0
+            //  1 0 1
+            //  0 0 0
+            if (j - 1 >= 0 && j + 1 < width && i + 2 < height && PLAYER == me && PLAYER == AT_A(1) && PLAYER == AT_D(1) && EMPTY == AT_V(2))
+                return !printf("%d,%d\n", i + 2, j);
+
+            //  0 1 0
+            //  0 0 1
+            //  0 1 0
+            if (j - 1 >= 0 && j + 1 < width && i + 2 < height && PLAYER == me && EMPTY == AT_A(1) && PLAYER == AT_D(1) && PLAYER == AT_V(2))
+                return !printf("%d,%d\n", i + 1, j - 1);
+
+            //  0 1 0
+            //  1 0 0
+            //  0 1 0
+            if (j - 1 >= 0 && j + 1 < width && i + 2 < height && PLAYER == me && PLAYER == AT_A(1) && EMPTY == AT_D(1) && PLAYER == AT_V(2))
+                return !printf("%d,%d\n", i + 1, j + 1);
+
 #ifdef DEBUG
             fprintf(log_file, "%c ", me);
         }
@@ -748,25 +774,50 @@ int main(int ac, const char *av[])
                 return !printf("%d,%d\n", i + 3, j - 3);
 
             //* block check *//
-            //  1 1
-            //  1 0
+            //  2 2
+            //  2 0
             if (j + 2 < width && i + 2 < height && OPPONENT == me && OPPONENT == AT_H(1) && OPPONENT == AT_V(1) && EMPTY == AT_D(1))
                 return !printf("%d,%d\n", i + 1, j + 1);
 
-            //  1 1
-            //  0 1
+            //  2 2
+            //  0 2
             if (j + 2 < width && i + 2 < height && OPPONENT == me && OPPONENT == AT_H(1) && EMPTY == AT_V(1) && OPPONENT == AT_D(1))
                 return !printf("%d,%d\n", i + 1, j);
 
-            //  1 0
-            //  1 1
+            //  2 0
+            //  2 2
             if (j + 2 < width && i + 2 < height && OPPONENT == me && EMPTY == AT_H(1) && OPPONENT == AT_V(1) && OPPONENT == AT_D(1))
                 return !printf("%d,%d\n", i, j + 1);
 
-            //  0 1
-            //  1 1
+            //  0 2
+            //  2 2
             if (j + 2 < width && i + 2 < height && EMPTY == me && OPPONENT == AT_H(1) && OPPONENT == AT_V(1) && OPPONENT == AT_D(1))
                 return !printf("%d,%d\n", i, j);
+
+            //* square check *//
+            //  0 0 0
+            //  2 0 2
+            //  0 2 0
+            if (j - 1 >= 0 && j + 1 < width && i + 2 < height && EMPTY == me && OPPONENT == AT_A(1) && OPPONENT == AT_D(1) && OPPONENT == AT_V(2))
+                return !printf("%d,%d\n", i, j);
+
+            //  0 2 0
+            //  2 0 2
+            //  0 0 0
+            if (j - 1 >= 0 && j + 1 < width && i + 2 < height && OPPONENT == me && OPPONENT == AT_A(1) && OPPONENT == AT_D(1) && EMPTY == AT_V(2))
+                return !printf("%d,%d\n", i + 2, j);
+
+            //  0 2 0
+            //  0 0 2
+            //  0 2 0
+            if (j - 1 >= 0 && j + 1 < width && i + 2 < height && OPPONENT == me && EMPTY == AT_A(1) && OPPONENT == AT_D(1) && OPPONENT == AT_V(2))
+                return !printf("%d,%d\n", i + 1, j - 1);
+
+            //  0 2 0
+            //  2 0 0
+            //  0 2 0
+            if (j - 1 >= 0 && j + 1 < width && i + 2 < height && OPPONENT == me && OPPONENT == AT_A(1) && EMPTY == AT_D(1) && OPPONENT == AT_V(2))
+                return !printf("%d,%d\n", i + 1, j + 1);
 
 #ifdef DEBUG
             fprintf(log_file, "%c ", me);
