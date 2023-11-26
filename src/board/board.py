@@ -74,7 +74,7 @@ class BoardGame:
         # Set up a window size based on board size including the log width
         self.game_width = self.board_size * self.cell_size
         self.total_width = self.game_width + self.log_width  # Update total width
-        self.game_height = self.game_width  # Making the window square
+        self.game_height = self.game_width + self.cell_size  # Making the window square
         self.screen = pygame.display.set_mode((self.total_width, self.game_height))  # Use total_width to consider the log space
         pygame.display.set_caption("GOMOKU Game")
         self.visible_count = self.game_height // (self.small_font.get_height() + 5)  # Calculate the number of moves that can be visible at once
@@ -109,6 +109,7 @@ class BoardGame:
         while self.game_started:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    print("MESSAGE Unplugging the brain")
                     pygame.quit()
                     quit()
                 self.handle_game_event(event)
