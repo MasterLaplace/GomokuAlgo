@@ -76,6 +76,23 @@ class Command:
             print(f"ERROR message - {error.message}")
 
     @staticmethod
+    def auto_train(game: Game, brain: Brain)-> tuple[int, int]:
+        try:
+            tmp: Game.CaseSate = game.getTurn()
+            y, x = brain.findBestSolution(game.getCopyBoard(), game.getSize())
+            game.turn(x, y)
+            if game.nb_turn > 8:
+                if game.is_end(tmp):
+                    Command.restart(game, brain)
+                    raise Game.End(str(tmp.name), Game.End.EndType.WIN)
+            return x, y
+        except Game.Error as error:
+            print(f"ERROR message - {error.message}")
+            if error.error_type == Game.Error.ErrorType.FORBIDEN:
+                raise Game.End(str(tmp.name), Game.End.EndType.LOSE)
+            raise Game.Error(error.message)
+
+    @staticmethod
     def start(game: Game, brain: Brain, size: int):
         if 4 < size < 31:
             try:
@@ -146,7 +163,7 @@ class Command:
                     if player == Game.CaseSate.EMPTY or player != game.getTurn():
                         raise ValueError
                     board[int(command_tab[1])][int(command_tab[0])] = player
-                    game.setTurn(player)
+                    game.setTurn(Game.CaseSate.PLAYER1 if player == Game.CaseSate.PLAYER2 else Game.CaseSate.PLAYER2)
                 except IndexError:
                     print("ERROR Invalid command")
                     continue
@@ -174,7 +191,7 @@ class Command:
             Game.evaluate = int(value)
         elif (key == "folder"):
             Game.folder = value
-            
+
     @staticmethod
     def end(game: Game, brain: Brain):
         game.end()
