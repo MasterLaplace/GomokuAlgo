@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2024
+** B-AIA-500-REN-5-1-gomoku
+** File description:
+** minmax_ai
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

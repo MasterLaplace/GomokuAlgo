@@ -174,9 +174,10 @@ class Brain:
             for j in range(size[0]):
                 board_data += str(board[i][j].value)
             board_data += " "
+        program = "./let_ai" if turn == Game.CaseSate.PLAYER2 else "./let_ai"
         try:
             result = subprocess.run(
-                ['./let_ai', str(size[1]), str(size[0])] + board_data.split(),
+                [program, str(size[1]), str(size[0])] + board_data.split(),
                 capture_output=True,
                 timeout=Game.timeout_turn,
                 text=True

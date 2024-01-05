@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2023
-** B-AIA-500-REN-5-1-gomoku-enzo.monnier
+** B-AIA-500-REN-5-1-gomoku
 ** File description:
 ** Laplacian Expanded Tree (LET) AI
 */

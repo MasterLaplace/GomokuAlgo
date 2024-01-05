@@ -28,6 +28,7 @@ all: linux
 linux:
 	@echo "Building for Linux..."
 	@$(CC_LINUX) -o let_ai ./src/ai/let_ai.c $(OPTI)
+	@$(CC_LINUX) -o minmax_ai ./src/ai/minmax_ai.c $(OPTI)
 	@cp ./src/main.py $(NAME)
 	@chmod +x $(NAME)
 
